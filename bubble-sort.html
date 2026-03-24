@@ -168,6 +168,11 @@
             transform: translateY(0);
         }
 
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         .highlight-yellow {
             background-color: #fff3cd;
             padding: 2px 4px;
@@ -237,6 +242,36 @@
             padding: 15px;
             margin: 10px 0;
             border-radius: 5px;
+        }
+
+        .step-info {
+            background: #f0f8ff;
+            border: 1px solid #667eea;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-size: 0.95em;
+        }
+
+        .speed-control {
+            margin: 15px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .speed-control label {
+            font-weight: bold;
+        }
+
+        .array-input {
+            padding: 10px;
+            font-size: 1em;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 100%;
+            max-width: 300px;
         }
 
         footer {
@@ -329,6 +364,40 @@ end algorithm</code></pre>
 
                 <div class="example-step">
                     <strong>最終結果：</strong> [1, 2, 5, 8, 9]
+                </div>
+            </section>
+
+            <!-- 模型動畫 -->
+            <section>
+                <h2>模型動畫</h2>
+
+                <p>下面是氣泡排序的可視化演示，你可以觀看算法如何逐步排序數列：</p>
+
+                <div class="visualization">
+                    <h3>排序可視化</h3>
+                    
+                    <div class="speed-control">
+                        <label for="arrayInput">輸入數組（用逗號分隔）：</label>
+                        <input type="text" id="arrayInput" class="array-input" value="5, 2, 8, 1, 9, 3, 7">
+                    </div>
+
+                    <div class="speed-control">
+                        <label for="speed">速度：</label>
+                        <input type="range" id="speed" min="50" max="1000" value="500" style="width: 200px;">
+                        <span id="speedLabel">中等</span>
+                    </div>
+
+                    <div class="controls">
+                        <button onclick="generateArray()">生成隨機數組</button>
+                        <button onclick="startAnimation()">開始排序</button>
+                        <button onclick="resetAnimation()">重置</button>
+                    </div>
+
+                    <div class="bars" id="bars"></div>
+
+                    <div class="step-info" id="stepInfo">
+                        準備就緒，點擊"開始排序"來觀看演示
+                    </div>
                 </div>
             </section>
 
@@ -637,8 +706,142 @@ void sortStudents(Student students[], int n) {
     </div>
 
     <script>
-        // 簡單的互動演示
+        let array = [5, 2, 8, 1, 9, 3, 7];
+        let isAnimating = false;
+
+        // 初始化視覺化
+        function initVisualization() {
+            const barsContainer = document.getElementById('bars');
+            barsContainer.innerHTML = '';
+            
+            array.forEach(num => {
+                const bar = document.createElement('div');
+                bar.className = 'bar';
+                bar.style.height = (num * 20) + 'px';
+                bar.textContent = num;
+                barsContainer.appendChild(bar);
+            });
+        }
+
+        // 生成隨機數組
+        function generateArray() {
+            if (isAnimating) return;
+            array = [];
+            for (let i = 0; i < 7; i++) {
+                array.push(Math.floor(Math.random() * 10) + 1);
+            }
+            initVisualization();
+            document.getElementById('stepInfo').textContent = '隨機數組已生成，點擊"開始排序"觀看演示';
+        }
+
+        // 重置動畫
+        function resetAnimation() {
+            if (isAnimating) return;
+            array = [5, 2, 8, 1, 9, 3, 7];
+            initVisualization();
+            document.getElementById('stepInfo').textContent = '已重置，準備就緒';
+        }
+
+        // 獲取延遲時間
+        function getDelay() {
+            const speed = parseInt(document.getElementById('speed').value);
+            return 1050 - speed;
+        }
+
+        // 更新速度標籤
+        document.getElementById('speed').addEventListener('input', function() {
+            const speed = parseInt(this.value);
+            if (speed < 300) {
+                document.getElementById('speedLabel').textContent = '超快';
+            } else if (speed < 500) {
+                document.getElementById('speedLabel').textContent = '快速';
+            } else if (speed < 750) {
+                document.getElementById('speedLabel').textContent = '中等';
+            } else {
+                document.getElementById('speedLabel').textContent = '緩慢';
+            }
+        });
+
+        // 開始動畫
+        async function startAnimation() {
+            if (isAnimating) return;
+            isAnimating = true;
+
+            const delay = getDelay();
+            const bars = document.querySelectorAll('.bar');
+
+            for (let i = 0; i < array.length - 1; i++) {
+                let swapped = false;
+
+                // 重置顏色
+                bars.forEach((bar, idx) => {
+                    if (idx > array.length - 1 - i) {
+                        bar.classList.add('sorted');
+                    } else {
+                        bar.classList.remove('sorted', 'highlight');
+                    }
+                });
+
+                // 比較相鄰元素
+                for (let j = 0; j < array.length - 1 - i; j++) {
+                    bars[j].classList.add('highlight');
+                    bars[j + 1].classList.add('highlight');
+
+                    document.getElementById('stepInfo').textContent = 
+                        `第 ${i + 1} 輪：比較 ${array[j]} 和 ${array[j + 1]}`;
+
+                    await new Promise(resolve => setTimeout(resolve, delay));
+
+                    // 如果需要交換
+                    if (array[j] > array[j + 1]) {
+                        [array[j], array[j + 1]] = [array[j + 1], array[j]];
+                        
+                        const tempHeight = bars[j].style.height;
+                        const tempText = bars[j].textContent;
+                        bars[j].style.height = bars[j + 1].style.height;
+                        bars[j].textContent = bars[j + 1].textContent;
+                        bars[j + 1].style.height = tempHeight;
+                        bars[j + 1].textContent = tempText;
+
+                        swapped = true;
+                        document.getElementById('stepInfo').textContent = 
+                            `第 ${i + 1} 輪：已交換 ${array[j + 1]} 和 ${array[j]}`;
+                    }
+
+                    bars[j].classList.remove('highlight');
+                    bars[j + 1].classList.remove('highlight');
+
+                    await new Promise(resolve => setTimeout(resolve, delay / 2));
+                }
+
+                // 標記最後排好的元素為已排序
+                bars[array.length - 1 - i].classList.add('sorted');
+
+                if (!swapped) {
+                    // 如果沒有交換發生，則數組已排序
+                    for (let k = 0; k <= array.length - 1 - i; k++) {
+                        bars[k].classList.add('sorted');
+                    }
+                    document.getElementById('stepInfo').textContent = '排序完成！數組已按升序排列。';
+                    break;
+                }
+
+                document.getElementById('stepInfo').textContent = 
+                    `第 ${i + 1} 輪完成，最大值已在正確位置`;
+
+                await new Promise(resolve => setTimeout(resolve, delay));
+            }
+
+            // 最後一個元素標記為已排序
+            bars[0].classList.add('sorted');
+            document.getElementById('stepInfo').textContent = '排序完成！數組已按升序排列。';
+            
+            isAnimating = false;
+        }
+
+        // 頁面加載時初始化
         document.addEventListener('DOMContentLoaded', function() {
+            initVisualization();
             console.log('氣泡排序法文檔已加載');
         });
     </script>
