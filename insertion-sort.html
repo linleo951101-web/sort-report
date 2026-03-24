@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>插入排序法 - 原理與應用</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        main {
+            padding: 40px;
+        }
+
+        section {
+            margin-bottom: 40px;
+        }
+
+        h2 {
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        h3 {
+            color: #764ba2;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        ul, ol {
+            margin-left: 30px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .code-block {
+            background: #f5f5f5;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+
+        code {
+            font-family: 'Courier New', monospace;
+            color: #c7254e;
+        }
+
+        pre code {
+            color: #333;
+        }
+
+        .visualization {
+            background: #f9f9f9;
+            border: 2px solid #667eea;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .bars {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 5px;
+            height: 200px;
+            margin: 20px 0;
+        }
+
+        .bar {
+            background: linear-gradient(180deg, #667eea, #764ba2);
+            border-radius: 5px 5px 0 0;
+            transition: all 0.3s ease;
+            position: relative;
+            color: white;
+            font-size: 12px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            min-width: 25px;
+        }
+
+        .bar.highlight {
+            background: linear-gradient(180deg, #ff6b6b, #ff5252);
+            box-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+        }
+
+        .bar.sorted {
+            background: linear-gradient(180deg, #51cf66, #40c057);
+            box-shadow: 0 0 10px rgba(81, 207, 102, 0.5);
+        }
+
+        .controls {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .highlight-yellow {
+            background-color: #fff3cd;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        .complexity-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .complexity-table th,
+        .complexity-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .complexity-table th {
+            background: #667eea;
+            color: white;
+            font-weight: bold;
+        }
+
+        .complexity-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .complexity-table tr:hover {
+            background: #f0f0f0;
+        }
+
+        .pros-cons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .pros, .cons {
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .pros {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+        }
+
+        .cons {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+        }
+
+        .pros h4 {
+            color: #155724;
+        }
+
+        .cons h4 {
+            color: #721c24;
+        }
+
+        .example-step {
+            background: #e7f3ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+
+        .step-info {
+            background: #f0f8ff;
+            border: 1px solid #667eea;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-size: 0.95em;
+        }
+
+        .speed-control {
+            margin: 15px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .speed-control label {
+            font-weight: bold;
+        }
+
+        .array-input {
+            padding: 10px;
+            font-size: 1em;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        footer {
+            background: #f5f5f5;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #ddd;
+        }
+
+        @media (max-width: 768px) {
+            .pros-cons {
+                grid-template-columns: 1fr;
+            }
+
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            main {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📥 插入排序法</h1>
+            <p>Insertion Sort - 高效的排序算法原理與應用</p>
+        </header>
+
+        <main>
+            <!-- 原理部分 -->
+            <section>
+                <h2>算法原理</h2>
+                
+                <h3>基本概念</h3>
+                <p>插入排序（Insertion Sort）是一種簡單且高效的排序算法，特別適合小型數據集。它的工作方式類似於整理撲克牌：將數列分為已排序和未排序兩部分，每次從未排序部分中取出一個元素，將其插入到已排序部分的適當位置，直到所有元素都被處理完成。</p>
+
+                <h3>工作原理</h3>
+                <ol>
+                    <li><strong>初始化</strong>：將第一個元素視為已排序</li>
+                    <li><strong>選擇元素</strong>：從未排序部分的第一個元素開始</li>
+                    <li><strong>比較和移動</strong>：將該元素與已排序部分的元素進行比較，找到適當的位置</li>
+                    <li><strong>插入元素</strong>：將元素插入到找到的位置</li>
+                    <li><strong>重複過程</strong>：對未排序部分的每個元素重複上述操作，直到整個數列排序完成</li>
+                </ol>
+
+                <h3>算法步驟</h3>
+                <div class="code-block">
+                    <pre><code>algorithm InsertionSort(array)
+    n = length(array)
+    for i = 1 to n-1
+        key = array[i]
+        j = i - 1
+        while j >= 0 and array[j] > key
+            array[j+1] = array[j]
+            j = j - 1
+        end while
+        array[j+1] = key
+    end for
+end algorithm</code></pre>
+                </div>
+
+                <h3>具體例子</h3>
+                <p>對數列 [5, 2, 8, 1, 9] 進行排序：</p>
+                
+                <div class="example-step">
+                    <strong>初始數列：</strong> [5, 2, 8, 1, 9]<br>
+                    已排序部分：[5]，未排序部分：[2, 8, 1, 9]
+                </div>
+
+                <div class="example-step">
+                    <strong>第一步：</strong> 插入 2<br>
+                    比較：2 < 5，2 應插在 5 前<br>
+                    結果：[2, 5, 8, 1, 9]<br>
+                    已排序部分：[2, 5]，未排序部分：[8, 1, 9]
+                </div>
+
+                <div class="example-step">
+                    <strong>第二步：</strong> 插入 8<br>
+                    比較：8 > 5，8 已在正確位置<br>
+                    結果：[2, 5, 8, 1, 9]<br>
+                    已排序部分：[2, 5, 8]，未排序部分：[1, 9]
+                </div>
+
+                <div class="example-step">
+                    <strong>第三步：</strong> 插入 1<br>
+                    比較：1 < 8，1 < 5，1 < 2，1 應插在最前<br>
+                    結果：[1, 2, 5, 8, 9]<br>
+                    已排序部分：[1, 2, 5, 8]，未排序部分：[9]
+                </div>
+
+                <div class="example-step">
+                    <strong>第四步：</strong> 插入 9<br>
+                    比較：9 > 8，9 已在正確位置<br>
+                    最終結果：[1, 2, 5, 8, 9]◎
+                </div>
+            </section>
+
+            <!-- 模型動畫 -->
+            <section>
+                <h2>模型動畫</h2>
+
+                <p>下面是插入排序的可視化演示，你可以觀看算法如何逐步排序數列：</p>
+
+                <div class="visualization">
+                    <h3>排序可視化</h3>
+                    
+                    <div class="speed-control">
+                        <label for="arrayInput">輸入數組（用逗號分隔）：</label>
+                        <input type="text" id="arrayInput" class="array-input" value="5, 2, 8, 1, 9, 3, 7">
+                    </div>
+
+                    <div class="speed-control">
+                        <label for="speed">速度：</label>
+                        <input type="range" id="speed" min="50" max="1000" value="500" style="width: 200px;">
+                        <span id="speedLabel">中等</span>
+                    </div>
+
+                    <div class="controls">
+                        <button onclick="generateArray()">生成隨機數組</button>
+                        <button onclick="startAnimation()">開始排序</button>
+                        <button onclick="resetAnimation()">重置</button>
+                    </div>
+
+                    <div class="bars" id="bars"></div>
+
+                    <div class="step-info" id="stepInfo">
+                        準備就緒，點擊"開始排序"來觀看演示
+                    </div>
+                </div>
+            </section>
+
+            <!-- 代碼實現 -->
+            <section>
+                <h2>代碼實現</h2>
+
+                <h3>C 語言實現</h3>
+                <div class="code-block">
+                    <pre><code>#include &lt;stdio.h&gt;
+
+void insertionSort(int arr[], int n) {
+    for (int i = 1; i &lt; n; i++) {
+        int key = arr[i];
+        int j = i - 1;
+        
+        // 將大於 key 的元素向後移動
+        while (j &gt;= 0 &amp;&amp; arr[j] &gt; key) {
+            arr[j + 1] = arr[j];
+            j--;
+        }
+        
+        // 將 key 插入到適當位置
+        arr[j + 1] = key;
+    }
+}
+
+int main() {
+    int arr[] = {64, 34, 25, 12, 22, 11, 90};
+    int n = sizeof(arr) / sizeof(arr[0]);
+    
+    insertionSort(arr, n);
+    
+    printf("排序後的數組：");
+    for (int i = 0; i &lt; n; i++) {
+        printf("%d ", arr[i]);
+    }
+    printf("\n");
+    return 0;
+}</code></pre>
+                </div>
+
+                <h3>C++ 語言實現</h3>
+                <div class="code-block">
+                    <pre><code>#include &lt;iostream&gt;
+using namespace std;
+
+void insertionSort(int arr[], int n) {
+    for (int i = 1; i &lt; n; i++) {
+        int key = arr[i];
+        int j = i - 1;
+        
+        while (j &gt;= 0 &amp;&amp; arr[j] &gt; key) {
+            arr[j + 1] = arr[j];
+            j--;
+        }
+        
+        arr[j + 1] = key;
+    }
+}
+
+int main() {
+    int arr[] = {64, 34, 25, 12, 22, 11, 90};
+    int n = sizeof(arr) / sizeof(arr[0]);
+    
+    insertionSort(arr, n);
+    
+    cout &lt;&lt; "排序後的數組：";
+    for (int i = 0; i &lt; n; i++) {
+        cout &lt;&lt; arr[i] &lt;&lt; " ";
+    }
+    cout &lt;&lt; endl;
+    return 0;
+}</code></pre>
+                </div>
+
+                <h3>Python 語言實現</h3>
+                <div class="code-block">
+                    <pre><code>def insertion_sort(arr):
+    for i in range(1, len(arr)):
+        key = arr[i]
+        j = i - 1
+        
+        while j &gt;= 0 and arr[j] &gt; key:
+            arr[j + 1] = arr[j]
+            j -= 1
+        
+        arr[j + 1] = key
+    
+    return arr
+
+# 使用範例
+arr = [64, 34, 25, 12, 22, 11, 90]
+sorted_arr = insertion_sort(arr)
+print("排序後的數組：", sorted_arr)</code></pre>
+                </div>
+            </section>
+
+            <!-- 性能分析 -->
+            <section>
+                <h2>性能分析</h2>
+
+                <table class="complexity-table">
+                    <thead>
+                        <tr>
+                            <th>分析項目</th>
+                            <th>時間複雜度</th>
+                            <th>說明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>最佳情況</strong></td>
+                            <td>O(n)</td>
+                            <td>數列已排序，每個元素只需比較一次</td>
+                        </tr>
+                        <tr>
+                            <td><strong>平均情況</strong></td>
+                            <td>O(n²)</td>
+                            <td>典型的隨機排列情況</td>
+                        </tr>
+                        <tr>
+                            <td><strong>最壞情況</strong></td>
+                            <td>O(n²)</td>
+                            <td>數列逆序排列，每個元素都需要與所有前面的元素比較</td>
+                        </tr>
+                        <tr>
+                            <td><strong>空間複雜度</strong></td>
+                            <td>O(1)</td>
+                            <td>只需要固定的額外空間</td>
+                        </tr>
+                        <tr>
+                            <td><strong>穩定性</strong></td>
+                            <td>穩定</td>
+                            <td>相等元素的相對順序不變</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>時間複雜度分析</h3>
+                <ul>
+                    <li><strong>比較次數</strong>：最好情況 n-1 次，最壞情況 1+2+...+(n-1) = n(n-1)/2 次</li>
+                    <li><strong>移動次數</strong>：最好情況 0 次，最壞情況 n(n-1)/2 次</li>
+                    <li><strong>總操作數</strong>：O(n²) 量級</li>
+                </ul>
+
+                <h3>性能特點</h3>
+                <ul>
+                    <li>對小規模數據集效率很高</li>
+                    <li>對部分有序的數據特別有效</li>
+                    <li>比氣泡排序更高效（常數因子更小）</li>
+                    <li>在實踐中常用於 O(n log n) 算法的基礎（如快速排序）</li>
+                </ul>
+            </section>
+
+            <!-- 優缺點 -->
+            <section>
+                <h2>優缺點分析</h2>
+
+                <div class="pros-cons">
+                    <div class="pros">
+                        <h4>✓ 優點</h4>
+                        <ul>
+                            <li>實現簡單，代碼量少</li>
+                            <li>對小規模數據非常高效</li>
+                            <li>無需額外空間，原地排序</li>
+                            <li>穩定排序算法</li>
+                            <li>自適應性強，對部分有序數據效率高</li>
+                            <li>在線排序（可邊接收邊排序）</li>
+                        </ul>
+                    </div>
+                    <div class="cons">
+                        <h4>✗ 缺點</h4>
+                        <ul>
+                            <li>時間複雜度為 O(n²)</li>
+                            <li>不適合大規模數據排序</li>
+                            <li>移動元素次數較多</li>
+                            <li>性能遠不如快速排序、歸併排序</li>
+                            <li>不適合實時性要求高的應用</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 應用領域 -->
+            <section>
+                <h2>應用領域</h2>
+
+                <h3>適用場景</h3>
+                <ul>
+                    <li><strong>小規模數據</strong>：數據量 &lt; 1000 時效率很好</li>
+                    <li><strong>部分有序數據</strong>：自適應性強，效率相對較高</li>
+                    <li><strong>在線排序</strong>：接收數據即可排序，不需提前獲得所有數據</li>
+                    <li><strong>內存限制</strong>：只需 O(1) 的額外空間</li>
+                    <li><strong>穩定排序需求</strong>：需要保持相等元素的相對順序</li>
+                    <li><strong>教學用途</strong>：算法簡單易懂，是學習排序的好材料</li>
+                </ul>
+
+                <h3>不適用場景</h3>
+                <ul>
+                    <li><strong>大規模數據排序</strong>：O(n²) 時間複雜度不可接受</li>
+                    <li><strong>實時系統</strong>：無法滿足嚴格的性能要求</li>
+                    <li><strong>競賽編程</strong>：通常會因時間限制而超時</li>
+                    <li><strong>生產環境</strong>：應優先使用已優化的標準庫函數</li>
+                </ul>
+
+                <h3>實際應用示例</h3>
+                <div class="code-block">
+                    <pre><code>// 示例：對學生成績單進行排序
+typedef struct {
+    char name[50];
+    int score;
+    char grade;
+} Student;
+
+void sortStudentsByScore(Student students[], int n) {
+    for (int i = 1; i &lt; n; i++) {
+        Student key = students[i];
+        int j = i - 1;
+        
+        while (j &gt;= 0 &amp;&amp; students[j].score &gt; key.score) {
+            students[j + 1] = students[j];
+            j--;
+        }
+        
+        students[j + 1] = key;
+    }
+}</code></pre>
+                </div>
+            </section>
+
+            <!-- 與其他排序算法的比較 -->
+            <section>
+                <h2>與其他排序算法的比較</h2>
+
+                <table class="complexity-table">
+                    <thead>
+                        <tr>
+                            <th>算法名稱</th>
+                            <th>最佳情況</th>
+                            <th>平均情況</th>
+                            <th>最壞情況</th>
+                            <th>空間</th>
+                            <th>穩定性</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>氣泡排序</strong></td>
+                            <td>O(n)</td>
+                            <td>O(n²)</td>
+                            <td>O(n²)</td>
+                            <td>O(1)</td>
+                            <td>穩定</td>
+                        </tr>
+                        <tr>
+                            <td><strong>選擇排序</strong></td>
+                            <td>O(n²)</td>
+                            <td>O(n²)</td>
+                            <td>O(n²)</td>
+                            <td>O(1)</td>
+                            <td>不穩定</td>
+                        </tr>
+                        <tr>
+                            <td><strong>插入排序</strong></td>
+                            <td>O(n)</td>
+                            <td>O(n²)</td>
+                            <td>O(n²)</td>
+                            <td>O(1)</td>
+                            <td>穩定</td>
+                        </tr>
+                        <tr>
+                            <td><strong>快速排序</strong></td>
+                            <td>O(n log n)</td>
+                            <td>O(n log n)</td>
+                            <td>O(n²)</td>
+                            <td>O(log n)</td>
+                            <td>不穩定</td>
+                        </tr>
+                        <tr>
+                            <td><strong>歸併排序</strong></td>
+                            <td>O(n log n)</td>
+                            <td>O(n log n)</td>
+                            <td>O(n log n)</td>
+                            <td>O(n)</td>
+                            <td>穩定</td>
+                        </tr>
+                        <tr>
+                            <td><strong>堆排序</strong></td>
+                            <td>O(n log n)</td>
+                            <td>O(n log n)</td>
+                            <td>O(n log n)</td>
+                            <td>O(1)</td>
+                            <td>不穩定</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- 總結 -->
+            <section>
+                <h2>總結</h2>
+
+                <p>插入排序是一種兼具簡單性和實用性的排序算法，具有以下特點：</p>
+
+                <ul>
+                    <li><span class="highlight-yellow">實現簡單</span>：代碼簡潔易懂，容易理解算法原理</li>
+                    <li><span class="highlight-yellow">自適應性強</span>：對部分有序的數據效率特別高</li>
+                    <li><span class="highlight-yellow">空間高效</span>：只需 O(1) 的額外空間</li>
+                    <li><span class="highlight-yellow">穩定性好</span>：能夠保持相等元素的相對順序</li>
+                    <li><span class="highlight-yellow">在線排序</span>：可以邊接收數據邊進行排序</li>
+                    <li><span class="highlight-yellow">時間效率低</span>：O(n²) 的時間複雜度限制其應用範圍</li>
+                    <li><span class="highlight-yellow">實用價值高</span>：常作為大規模算法的基礎或優化手段</li>
+                </ul>
+
+                <p><strong>建議：</strong>在實際應用中，對小規模數據（&lt; 1000 個元素）使用插入排序是個不錯的選擇。對於大規模數據，應優先使用快速排序、歸併排序或使用標準庫提供的優化排序函數。許多高效排序算法（如 Timsort）內部就使用了插入排序作為優化策略。</p>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 排序算法學習中心 | 插入排序法完全指南</p>
+            <p>本文檔提供了插入排序的原理、實現和應用說明</p>
+        </footer>
+    </div>
+
+    <script>
+        let array = [5, 2, 8, 1, 9, 3, 7];
+        let isAnimating = false;
+
+        // 初始化視覺化
+        function initVisualization() {
+            const barsContainer = document.getElementById('bars');
+            barsContainer.innerHTML = '';
+            
+            array.forEach(num => {
+                const bar = document.createElement('div');
+                bar.className = 'bar';
+                bar.style.height = (num * 20) + 'px';
+                bar.textContent = num;
+                barsContainer.appendChild(bar);
+            });
+        }
+
+        // 生成隨機數組
+        function generateArray() {
+            if (isAnimating) return;
+            array = [];
+            for (let i = 0; i < 7; i++) {
+                array.push(Math.floor(Math.random() * 10) + 1);
+            }
+            initVisualization();
+            document.getElementById('stepInfo').textContent = '隨機數組已生成，點擊"開始排序"觀看演示';
+        }
+
+        // 重置動畫
+        function resetAnimation() {
+            if (isAnimating) return;
+            array = [5, 2, 8, 1, 9, 3, 7];
+            initVisualization();
+            document.getElementById('stepInfo').textContent = '已重置，準備就緒';
+        }
+
+        // 獲取延遲時間
+        function getDelay() {
+            const speed = parseInt(document.getElementById('speed').value);
+            return 1050 - speed;
+        }
+
+        // 更新速度標籤
+        document.getElementById('speed').addEventListener('input', function() {
+            const speed = parseInt(this.value);
+            if (speed < 300) {
+                document.getElementById('speedLabel').textContent = '超快';
+            } else if (speed < 500) {
+                document.getElementById('speedLabel').textContent = '快速';
+            } else if (speed < 750) {
+                document.getElementById('speedLabel').textContent = '中等';
+            } else {
+                document.getElementById('speedLabel').textContent = '緩慢';
+            }
+        });
+
+        // 開始動畫
+        async function startAnimation() {
+            if (isAnimating) return;
+            isAnimating = true;
+
+            const delay = getDelay();
+            const bars = document.querySelectorAll('.bar');
+
+            // 第一個元素標記為已排序
+            bars[0].classList.add('sorted');
+
+            for (let i = 1; i < array.length; i++) {
+                bars[i].classList.add('highlight');
+                document.getElementById('stepInfo').textContent = 
+                    `開始插入第 ${i} 個元素：${array[i]}`;
+
+                await new Promise(resolve => setTimeout(resolve, delay));
+
+                let key = array[i];
+                let j = i - 1;
+
+                // 找到插入位置
+                while (j >= 0 && array[j] > key) {
+                    bars[j].classList.add('highlight');
+                    bars[j + 1].classList.remove('highlight');
+
+                    document.getElementById('stepInfo').textContent = 
+                        `比較 ${array[j]} 和 ${key}：${array[j]} > ${key}，需要移動`;
+
+                    await new Promise(resolve => setTimeout(resolve, delay / 2));
+
+                    // 移動元素
+                    array[j + 1] = array[j];
+                    bars[j + 1].style.height = bars[j].style.height;
+                    bars[j + 1].textContent = bars[j].textContent;
+
+                    j--;
+                    await new Promise(resolve => setTimeout(resolve, delay / 2));
+                }
+
+                // 插入元素到正確位置
+                array[j + 1] = key;
+                bars[j + 1].style.height = (key * 20) + 'px';
+                bars[j + 1].textContent = key;
+
+                document.getElementById('stepInfo').textContent = 
+                    `${key} 已插入到位置 ${j + 1}`;
+
+                // 標記已排序的部分
+                for (let k = 0; k <= i; k++) {
+                    bars[k].classList.remove('highlight');
+                    bars[k].classList.add('sorted');
+                }
+
+                await new Promise(resolve => setTimeout(resolve, delay));
+            }
+
+            document.getElementById('stepInfo').textContent = '排序完成！數組已按升序排列。';
+            isAnimating = false;
+        }
+
+        // 頁面加載時初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initVisualization();
+            console.log('插入排序法文檔已加載');
+        });
+    </script>
+</body>
+</html>
