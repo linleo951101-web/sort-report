@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>歸併排序法 - 原理與應用</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        main {
+            padding: 40px;
+        }
+
+        section {
+            margin-bottom: 40px;
+        }
+
+        h2 {
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        h3 {
+            color: #764ba2;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        ul, ol {
+            margin-left: 30px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .code-block {
+            background: #f5f5f5;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+
+        code {
+            font-family: 'Courier New', monospace;
+            color: #c7254e;
+        }
+
+        pre code {
+            color: #333;
+        }
+
+        .complexity-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .complexity-table th,
+        .complexity-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .complexity-table th {
+            background: #667eea;
+            color: white;
+            font-weight: bold;
+        }
+
+        .complexity-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .complexity-table tr:hover {
+            background: #f0f0f0;
+        }
+
+        .pros-cons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .pros, .cons {
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .pros {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+        }
+
+        .cons {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+        }
+
+        .pros h4 {
+            color: #155724;
+        }
+
+        .cons h4 {
+            color: #721c24;
+        }
+
+        .visualization {
+            background: #f9f9f9;
+            border: 2px solid #667eea;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .animation-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 10px;
+            min-height: 260px;
+            padding: 20px;
+            background: #ffffff;
+            border: 2px dashed #764ba2;
+            border-radius: 12px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .bar {
+            width: 40px;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px 8px 0 0;
+            transition: height 0.35s ease, transform 0.35s ease, background 0.35s ease, box-shadow 0.35s ease;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            color: white;
+            font-weight: 700;
+            padding-bottom: 6px;
+            position: relative;
+        }
+
+        .bar::before {
+            content: attr(data-index);
+            position: absolute;
+            top: -20px;
+            font-size: 0.75rem;
+            color: rgba(0, 0, 0, 0.65);
+        }
+
+        .bar.merge {
+            background: linear-gradient(180deg, #28a745 0%, #20c997 100%);
+            box-shadow: 0 10px 24px rgba(40, 167, 69, 0.25);
+        }
+
+        .bar.sorted {
+            background: linear-gradient(180deg, #17a2b8 0%, #20c997 100%);
+            box-shadow: 0 0 12px rgba(23, 162, 184, 0.3);
+        }
+
+        .bar.highlight,
+        .bar.compare,
+        .bar.active {
+            background: linear-gradient(180deg, #ff6b6b, #ff5252);
+            box-shadow: 0 0 18px rgba(255, 107, 107, 0.45);
+            transform: translateY(-10px) scale(1.02);
+        }
+
+        .bar.highlight,
+        .bar.compare,
+        .bar.active {
+            background: linear-gradient(180deg, #ff6b6b, #ff5252);
+            box-shadow: 0 0 18px rgba(255, 107, 107, 0.45);
+        }
+
+        .bar.split-left {
+            box-shadow: inset 0 0 0 2px rgba(102, 126, 234, 0.25);
+        }
+
+        .bar.split-right {
+            box-shadow: inset 0 0 0 2px rgba(220, 53, 69, 0.25);
+        }
+
+        .step-info {
+            font-size: 0.95rem;
+            color: #333;
+            margin-top: 12px;
+            font-weight: 600;
+            min-height: 24px;
+            background: #f0f8ff;
+            border: 1px solid #667eea;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .speed-control {
+            margin: 15px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .speed-control label {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .controls button {
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .controls button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .controls {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .controls .btn {
+            margin: 5px;
+        }
+
+        .controls label {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 12px;
+            color: #333;
+            font-size: 0.95rem;
+        }
+
+        .controls input[type="range"] {
+            vertical-align: middle;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .controls .btn {
+            margin: 5px;
+        }
+
+        .summary {
+            background: #eef2ff;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            margin: 20px 0;
+        }
+
+        .button-row {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+        }
+
+        @media (max-width: 768px) {
+            .pros-cons {
+                grid-template-columns: 1fr;
+            }
+
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            main {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔀 歸併排序法</h1>
+            <p>Merge Sort - 分治策略與穩定排序實作</p>
+        </header>
+
+        <main>
+            <section>
+                <h2>算法原理</h2>
+                <p>歸併排序（Merge Sort）是一種基於分治思想的排序算法。它將原始數列不斷分割成更小的子序列，對子序列進行排序，然後再將已排序的子序列合併成完整的有序序列。</p>
+
+                <h3>分治思想</h3>
+                <ol>
+                    <li>將數列從中間切分為左右兩個子序列</li>
+                    <li>遞歸地對左右子序列進行歸併排序</li>
+                    <li>將兩個已排序的子序列合併成一個有序序列</li>
+                </ol>
+
+                <h3>穩定性</h3>
+                <p>歸併排序是一種穩定排序算法，因為在合併過程中遇到兩個相等元素時，通常會保持它們原本的相對順序。</p>
+            </section>
+
+            <section>
+                <h2>算法步驟</h2>
+                <div class="code-block">
+                    <pre><code>algorithm MergeSort(array)
+    if length(array) <= 1
+        return array
+    mid = floor(length(array) / 2)
+    left = MergeSort(array[0:mid])
+    right = MergeSort(array[mid:])
+    return Merge(left, right)
+
+algorithm Merge(left, right)
+    result = []
+    while left not empty and right not empty
+        if first(left) <= first(right)
+            append first(left) to result
+            remove first(left)
+        else
+            append first(right) to result
+            remove first(right)
+    append remaining elements from left or right to result
+    return result</code></pre>
+                </div>
+
+                <h3>示例流程</h3>
+                <div class="visualization">
+                    <p><strong>原始序列：</strong> [7, 3, 5, 1, 9, 4]</p>
+                    <p><strong>分割過程：</strong> [7, 3, 5] 和 [1, 9, 4]</p>
+                    <p><strong>遞歸排序：</strong> [3, 5, 7] 和 [1, 4, 9]</p>
+                    <p><strong>合併結果：</strong> [1, 3, 4, 5, 7, 9]</p>
+                </div>
+            </section>
+
+            <section>
+                <h2>動畫模擬</h2>
+                <p>以下模擬展示歸併排序如何拆分陣列並逐步合併。請點擊「開始模擬」以觀看過程。</p>
+                <div class="animation-container" id="animationArray"></div>
+                <div class="step-info" id="stepInfo">按下「開始模擬」以觀看歸併排序拆分與合併的每個步驟。</div>
+                <div class="speed-control">
+                    <label for="speed">速度：</label>
+                    <input type="range" id="speed" min="100" max="1000" step="50" value="700">
+                    <span id="speedLabel">中等</span>
+                </div>
+                <div class="controls">
+                    <button id="generateBtn" class="btn btn-secondary">生成隨機陣列</button>
+                    <button id="startBtn" class="btn">開始模擬</button>
+                    <button id="resetBtn" class="btn btn-secondary">重置</button>
+                </div>
+            </section>
+
+            <section>
+                <h2>代碼實現</h2>
+                <h3>C 語言版本</h3>
+                <div class="code-block">
+                    <pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+void merge(int arr[], int left, int mid, int right) {
+    int n1 = mid - left + 1;
+    int n2 = right - mid;
+    int *L = malloc(n1 * sizeof(int));
+    int *R = malloc(n2 * sizeof(int));
+
+    for (int i = 0; i < n1; i++)
+        L[i] = arr[left + i];
+    for (int j = 0; j < n2; j++)
+        R[j] = arr[mid + 1 + j];
+
+    int i = 0, j = 0, k = left;
+    while (i < n1 && j < n2) {
+        if (L[i] <= R[j]) {
+            arr[k++] = L[i++];
+        } else {
+            arr[k++] = R[j++];
+        }
+    }
+    while (i < n1) arr[k++] = L[i++];
+    while (j < n2) arr[k++] = R[j++];
+
+    free(L);
+    free(R);
+}
+
+void mergeSort(int arr[], int left, int right) {
+    if (left < right) {
+        int mid = left + (right - left) / 2;
+        mergeSort(arr, left, mid);
+        mergeSort(arr, mid + 1, right);
+        merge(arr, left, mid, right);
+    }
+}
+
+int main() {
+    int data[] = {7, 3, 5, 1, 9, 4};
+    int size = sizeof(data) / sizeof(data[0]);
+    mergeSort(data, 0, size - 1);
+    for (int i = 0; i < size; i++) {
+        printf("%d ", data[i]);
+    }
+    return 0;
+}</code></pre>
+                </div>
+            </section>
+
+            <section>
+                <h2>時間與空間複雜度</h2>
+                <table class="complexity-table">
+                    <thead>
+                        <tr>
+                            <th>項目</th>
+                            <th>最佳情況</th>
+                            <th>平均情況</th>
+                            <th>最壞情況</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>時間複雜度</td>
+                            <td>O(n log n)</td>
+                            <td>O(n log n)</td>
+                            <td>O(n log n)</td>
+                        </tr>
+                        <tr>
+                            <td>空間複雜度</td>
+                            <td colspan="3">O(n)（額外暫存空間）</td>
+                        </tr>
+                        <tr>
+                            <td>穩定性</td>
+                            <td colspan="3">穩定</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="pros-cons">
+                    <div class="pros">
+                        <h4>優點</h4>
+                        <ul>
+                            <li>時間複雜度穩定，適合大型數據集</li>
+                            <li>排序穩定，可保持相等元素順序</li>
+                            <li>分治策略概念清晰</li>
+                        </ul>
+                    </div>
+                    <div class="cons">
+                        <h4>缺點</h4>
+                        <ul>
+                            <li>需要額外空間存放暫存陣列</li>
+                            <li>實現較快速排序稍複雜</li>
+                            <li>在小數據集上不一定最有效</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2>應用場景</h2>
+                <p>歸併排序適用於需要穩定排序或大量資料處理的情境。典型應用包括：</p>
+                <ul>
+                    <li>大規模資料庫排序與外部排序</li>
+                    <li>合併多個已排序清單</li>
+                    <li>分治式演算法底層排序步驟</li>
+                    <li>資料分析與統計計算中的穩定排序需求</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>總結</h2>
+                <div class="summary">
+                    <p>歸併排序是一種穩定且時間複雜度穩定的排序算法。它特別適合大型資料集與已排序子列的合併操作，但需要額外的暫存空間。</p>
+                    <p>透過分治策略，歸併排序將問題拆解為更簡單的子問題，再將結果組合回來，這使得它在處理複雜資料時更具可預測性。</p>
+                </div>
+            </section>
+
+            <div class="button-row">
+                <a href="index.html" class="btn">返回首頁</a>
+            </div>
+        </main>
+    </div>
+    <script>
+        let data = [7, 3, 5, 1, 9, 4];
+        let isAnimating = false;
+        const animationArray = document.getElementById('animationArray');
+        const startBtn = document.getElementById('startBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const generateBtn = document.getElementById('generateBtn');
+        const speedInput = document.getElementById('speed');
+        const speedLabel = document.getElementById('speedLabel');
+        const stepInfo = document.getElementById('stepInfo');
+        let frames = [];
+        let timeoutIds = [];
+        let speed = Number(speedInput.value);
+
+        function initVisualization() {
+            renderFrame({ arr: [...data], left: -1, right: -1, active: -1, compare: [], phase: '準備就緒，點擊「開始模擬」觀看演示', mid: -1, sortedRange: -1 });
+        }
+
+        function renderFrame(frame) {
+            animationArray.innerHTML = '';
+            frame.arr.forEach((value, index) => {
+                const bar = document.createElement('div');
+                bar.className = 'bar';
+                bar.dataset.index = index;
+                bar.style.height = `${value * 18 + 30}px`;
+                bar.textContent = value;
+
+                if (frame.compare && frame.compare.includes(index)) {
+                    bar.classList.add('compare');
+                }
+                if (index === frame.active) {
+                    bar.classList.add('active');
+                }
+                if (frame.left !== -1 && index >= frame.left && index <= frame.right) {
+                    bar.classList.add('merge');
+                }
+                if (frame.mid !== -1) {
+                    if (index >= frame.left && index <= frame.mid) bar.classList.add('split-left');
+                    if (index > frame.mid && index <= frame.right) bar.classList.add('split-right');
+                }
+                if (frame.sortedRange !== -1 && index >= frame.left && index <= frame.sortedRange) {
+                    bar.classList.add('sorted');
+                }
+
+                animationArray.appendChild(bar);
+            });
+
+            stepInfo.textContent = frame.phase || '正在準備排序模擬…';
+        }
+
+        function capture(arr, options = {}) {
+            frames.push({
+                arr: [...arr],
+                left: options.left ?? -1,
+                right: options.right ?? -1,
+                active: options.active ?? -1,
+                compare: options.compare ?? [],
+                phase: options.phase || '',
+                mid: options.mid ?? -1,
+                sortedRange: options.sortedRange ?? -1,
+            });
+        }
+
+        function mergeSortAnimate(arr, left, right) {
+            if (left >= right) {
+                capture(arr, {
+                    left,
+                    right,
+                    active: left,
+                    phase: `單一元素子區間 [${left}]，準備返回`,
+                    mid: left,
+                });
+                return;
+            }
+            const mid = Math.floor((left + right) / 2);
+            capture(arr, {
+                left,
+                right,
+                active: mid,
+                phase: `分割子區間 [${left}..${right}]，中點 = ${mid}`,
+                mid,
+            });
+
+            mergeSortAnimate(arr, left, mid);
+            mergeSortAnimate(arr, mid + 1, right);
+            merge(arr, left, mid, right);
+            capture(arr, {
+                left,
+                right,
+                active: left,
+                phase: `已完成合併 [${left}..${right}]`,
+                mid,
+                sortedRange: right,
+            });
+        }
+
+        function merge(arr, left, mid, right) {
+            const leftArr = arr.slice(left, mid + 1);
+            const rightArr = arr.slice(mid + 1, right + 1);
+            let i = 0;
+            let j = 0;
+            let k = left;
+
+            while (i < leftArr.length && j < rightArr.length) {
+                const leftIndex = left + i;
+                const rightIndex = mid + 1 + j;
+                capture(arr, {
+                    left,
+                    right,
+                    active: k,
+                    compare: [leftIndex, rightIndex],
+                    phase: `比較左側 ${leftArr[i]} 與右側 ${rightArr[j]}，結果將寫入位置 ${k}`,
+                    mid,
+                });
+
+                if (leftArr[i] <= rightArr[j]) {
+                    arr[k] = leftArr[i++];
+                } else {
+                    arr[k] = rightArr[j++];
+                }
+
+                capture(arr, {
+                    left,
+                    right,
+                    active: k,
+                    compare: [leftIndex, rightIndex],
+                    phase: `寫回值 ${arr[k]} 到位置 ${k}`,
+                    mid,
+                    sortedRange: k,
+                });
+                k++;
+            }
+
+            while (i < leftArr.length) {
+                const leftIndex = left + i;
+                arr[k] = leftArr[i++];
+                capture(arr, {
+                    left,
+                    right,
+                    active: k,
+                    compare: [leftIndex],
+                    phase: `剩餘左側元素 ${arr[k]} 寫回位置 ${k}`,
+                    mid,
+                    sortedRange: k,
+                });
+                k++;
+            }
+
+            while (j < rightArr.length) {
+                const rightIndex = mid + 1 + j;
+                arr[k] = rightArr[j++];
+                capture(arr, {
+                    left,
+                    right,
+                    active: k,
+                    compare: [rightIndex],
+                    phase: `剩餘右側元素 ${arr[k]} 寫回位置 ${k}`,
+                    mid,
+                    sortedRange: k,
+                });
+                k++;
+            }
+        }
+
+        function getDelay() {
+            return 1100 - speed;
+        }
+
+        function updateSpeedLabel() {
+            const value = speed;
+            if (value <= 250) {
+                speedLabel.textContent = '超快';
+            } else if (value <= 500) {
+                speedLabel.textContent = '快速';
+            } else if (value <= 750) {
+                speedLabel.textContent = '中等';
+            } else {
+                speedLabel.textContent = '緩慢';
+            }
+        }
+
+        function setButtonsDisabled(disabled) {
+            startBtn.disabled = disabled;
+            resetBtn.disabled = disabled;
+            generateBtn.disabled = disabled;
+        }
+
+        function startAnimation() {
+            if (isAnimating) return;
+            isAnimating = true;
+            setButtonsDisabled(true);
+            frames = [];
+            timeoutIds.forEach(id => clearTimeout(id));
+            timeoutIds = [];
+            const arrCopy = [...data];
+            mergeSortAnimate(arrCopy, 0, arrCopy.length - 1);
+
+            const delay = getDelay();
+            frames.forEach((frame, index) => {
+                const id = setTimeout(() => {
+                    renderFrame(frame);
+                    if (index === frames.length - 1) {
+                        isAnimating = false;
+                        setButtonsDisabled(false);
+                        stepInfo.textContent = '排序完成！已完成全部合併步驟。';
+                    }
+                }, index * delay);
+                timeoutIds.push(id);
+            });
+        }
+
+        function resetAnimation() {
+            if (isAnimating) return;
+            timeoutIds.forEach(id => clearTimeout(id));
+            timeoutIds = [];
+            data = [7, 3, 5, 1, 9, 4];
+            initVisualization();
+        }
+
+        function generateArray() {
+            if (isAnimating) return;
+            data = Array.from({ length: 6 }, () => Math.floor(Math.random() * 10) + 1);
+            initVisualization();
+            stepInfo.textContent = '隨機陣列已生成，點擊「開始模擬」觀看演示。';
+        }
+
+        speedInput.addEventListener('input', () => {
+            speed = Number(speedInput.value);
+            updateSpeedLabel();
+        });
+
+        startBtn.addEventListener('click', startAnimation);
+        resetBtn.addEventListener('click', resetAnimation);
+        generateBtn.addEventListener('click', generateArray);
+
+        document.addEventListener('DOMContentLoaded', function() {
+            updateSpeedLabel();
+            initVisualization();
+        });
+    </script>
+</body>
+</html>

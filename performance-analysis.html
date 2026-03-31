@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>性能分析 - 算法學習中心</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif;
+            background: #f4f7fb;
+            color: #333;
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        header {
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        header a {
+            text-decoration: none;
+            color: #667eea;
+            font-weight: 600;
+        }
+        h1 {
+            font-size: 2.8em;
+            margin-bottom: 10px;
+        }
+        .intro {
+            font-size: 1.1em;
+            color: #555;
+            margin-bottom: 30px;
+        }
+        section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.12);
+        }
+        section h2 {
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        section p {
+            margin-bottom: 18px;
+            color: #555;
+        }
+        .highlight {
+            color: #667eea;
+            font-weight: 600;
+        }
+        .complexity-list {
+            margin-top: 20px;
+            list-style: disc inside;
+            color: #555;
+        }
+        .complexity-list li {
+            margin-bottom: 10px;
+        }
+        .note {
+            background: #eef3ff;
+            border-left: 4px solid #667eea;
+            padding: 18px 20px;
+            border-radius: 12px;
+            color: #334e8b;
+        }
+        footer {
+            text-align: center;
+            color: #777;
+            margin-top: 20px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: transform 0.2s ease;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #e0e7ff;
+            padding: 14px 16px;
+            text-align: left;
+        }
+        th {
+            background: #eef3ff;
+            color: #2c3e50;
+        }
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            h1 {
+                font-size: 2.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <h1>性能分析</h1>
+                <p class="intro">了解排序算法的時間與空間複雜度，幫助你在實際問題中選擇更合適的解法。</p>
+            </div>
+            <a href="index.html" class="btn">回到首頁</a>
+        </header>
+
+        <section>
+            <h2>時間複雜度</h2>
+            <p>時間複雜度衡量演算法隨輸入規模增長時，所需計算步驟的增長速度。常見的複雜度級別包括 <span class="highlight">O(1)</span>、<span class="highlight">O(n)</span>、<span class="highlight">O(n log n)</span>、<span class="highlight">O(n^2)</span> 等。</p>
+            <p>對於排序算法來說，最佳情況、平均情況與最壞情況可能會有很大差異。例如，氣泡排序在最佳情況下是 <span class="highlight">O(n)</span>，但在平均和最壞情況下則是 <span class="highlight">O(n^2)</span>。</p>
+        </section>
+
+        <section>
+            <h2>空間複雜度</h2>
+            <p>空間複雜度表示演算法在執行過程中除了輸入資料外，還需要額外使用多少記憶體空間。對於排序算法，<span class="highlight">原地排序</span>通常只需要 <span class="highlight">O(1)</span> 額外空間，而非原地排序可能需要額外的記憶體。</p>
+            <p>例如，合併排序需要額外的暫存空間，因此其空間複雜度為 <span class="highlight">O(n)</span>，而選擇排序和插入排序通常是 <span class="highlight">O(1)</span>。</p>
+        </section>
+
+        <section>
+            <h2>排序算法比較</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>算法</th>
+                        <th>最佳情況</th>
+                        <th>平均情況</th>
+                        <th>最壞情況</th>
+                        <th>空間</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>氣泡排序</td>
+                        <td>O(n)</td>
+                        <td>O(n^2)</td>
+                        <td>O(n^2)</td>
+                        <td>O(1)</td>
+                    </tr>
+                    <tr>
+                        <td>選擇排序</td>
+                        <td>O(n^2)</td>
+                        <td>O(n^2)</td>
+                        <td>O(n^2)</td>
+                        <td>O(1)</td>
+                    </tr>
+                    <tr>
+                        <td>插入排序</td>
+                        <td>O(n)</td>
+                        <td>O(n^2)</td>
+                        <td>O(n^2)</td>
+                        <td>O(1)</td>
+                    </tr>
+                    <tr>
+                        <td>合併排序</td>
+                        <td>O(n log n)</td>
+                        <td>O(n log n)</td>
+                        <td>O(n log n)</td>
+                        <td>O(n)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="note">
+            <h2>實作提醒</h2>
+            <p>選擇算法時，不只要看平均時間複雜度，也要考慮資料規模、是否需要穩定排序、記憶體使用量與實作難度。</p>
+        </section>
+
+        <footer>
+            <p>&copy; 2026 算法學習中心。性能分析幫助您更快找到最佳排序策略。</p>
+        </footer>
+    </div>
+</body>
+</html>
