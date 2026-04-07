@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>快速排序法 - 原理與應用</title>
+    <style>
+        /* 直接復用插入排序的樣式以保持一致性 */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #333; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; min-height: 100vh; }
+        .container { max-width: 1200px; margin: 0 auto; background: linear-gradient(180deg, #fffaf0 0%, #fff6ee 100%); border-radius: 10px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); overflow: hidden; }
+        header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px 20px; text-align: center; }
+        header h1 { font-size: 2.5em; margin-bottom: 10px; }
+        header p { font-size: 1.1em; opacity: 0.9; }
+        main { padding: 40px; }
+        h2 { color: #667eea; border-bottom: 3px solid #667eea; padding-bottom: 10px; margin-bottom: 20px; font-size: 1.8em; }
+        .visualization { background: #f9f9f9; border: 2px solid #667eea; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center; }
+        .bars { display:flex; align-items:flex-end; justify-content:center; gap:5px; height:200px; margin:20px 0; }
+        .bar { background: linear-gradient(180deg,#667eea,#764ba2); border-radius:5px 5px 0 0; transition: all 0.25s ease; position:relative; color:white; font-size:12px; display:flex; align-items:flex-end; justify-content:center; min-width:25px; }
+        .bar.highlight { background: linear-gradient(180deg,#ff6b6b,#ff5252); box-shadow:0 0 10px rgba(255,107,107,0.5); }
+        .bar.pivot { background: linear-gradient(180deg,#ffd43b,#ffb703); box-shadow:0 0 10px rgba(255,196,0,0.4); }
+        .bar.sorted { background: linear-gradient(180deg,#51cf66,#40c057); box-shadow:0 0 10px rgba(81,207,102,0.5); }
+        .controls { margin: 20px 0; text-align:center; }
+        button { background: linear-gradient(135deg,#667eea,#764ba2); color:white; border:none; padding:10px 20px; margin:5px; border-radius:5px; cursor:pointer; font-size:1em; }
+        .array-input { padding:10px; font-size:1em; border:1px solid #ddd; border-radius:5px; width:100%; max-width:300px; }
+        .code-block { background:#fff7f0; border-left:4px solid #667eea; padding:15px; margin:15px 0; border-radius:5px; overflow-x:auto; }
+        footer { background:#f5f5f5; padding:20px; text-align:center; color:#666; border-top:1px solid #ddd; }
+        @media (max-width:768px){ main{ padding:20px } header h1{ font-size:1.8em } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⚡ 快速排序法</h1>
+            <p>Quick Sort - 分治策略的高效排序演算法</p>
+        </header>
+
+        <main>
+            <section>
+                <h2>算法原理</h2>
+                <p>快速排序（Quick Sort）是一種基於分治法的排序演算法。它選取一個樞紐（pivot），將陣列分成比 pivot 小與大的兩部分，分別遞迴排序，再合併結果。</p>
+
+                <h3>基本步驟</h3>
+                <ol>
+                    <li>選取 pivot（如最後一個元素）</li>
+                    <li>進行 partition，將小於 pivot 的元素放左邊，大於 pivot 的放右邊</li>
+                    <li>遞迴對左右子陣列進行快速排序</li>
+                </ol>
+
+                <div class="code-block">
+<pre><code>function quickSort(arr, low, high)
+    if low < high
+        p = partition(arr, low, high)
+        quickSort(arr, low, p - 1)
+        quickSort(arr, p + 1, high)
+    end if
+end function</code></pre>
+                </div>
+            </section>
+
+            <section>
+                <h2>模型動畫</h2>
+
+                <p>下面是快速排序的可視化演示，你可以觀看算法如何逐步排序數列：</p>
+
+                <div class="visualization">
+                    <h3>排序可視化</h3>
+
+                    <div class="speed-control">
+                        <label for="arrayInput">輸入數組（用逗號分隔）：</label>
+                        <input type="text" id="arrayInput" class="array-input" value="5, 2, 8, 1, 9, 3, 7">
+                    </div>
+
+                    <div class="speed-control">
+                        <label for="speed">速度：</label>
+                        <input type="range" id="speed" min="50" max="1000" value="500" style="width: 200px;">
+                        <span id="speedLabel">中等</span>
+                    </div>
+
+                    <div class="controls">
+                        <button onclick="generateArray()">生成隨機數組</button>
+                        <button onclick="startAnimation()">開始排序</button>
+                        <button onclick="resetAnimation()">重置</button>
+                    </div>
+
+                    <div class="bars" id="bars"></div>
+
+                    <div class="step-info" id="stepInfo">
+                        準備就緒，點擊"開始排序"來觀看演示
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2>代碼實現（範例）</h2>
+                <h3>Python</h3>
+                <div class="code-block">
+<pre><code>def quicksort(arr):
+    def partition(a, low, high):
+        pivot = a[high]
+        i = low - 1
+        for j in range(low, high):
+            if a[j] <= pivot:
+                i += 1
+                a[i], a[j] = a[j], a[i]
+        a[i+1], a[high] = a[high], a[i+1]
+        return i+1
+
+    def qs(a, low, high):
+        if low < high:
+            p = partition(a, low, high)
+            qs(a, low, p-1)
+            qs(a, p+1, high)
+
+    qs(arr, 0, len(arr)-1)
+    return arr</code></pre>
+                </div>
+            </section>
+            
+            <section>
+                <h2>性能分析</h2>
+
+                <table class="complexity-table">
+                    <thead>
+                        <tr>
+                            <th>分析項目</th>
+                            <th>時間複雜度</th>
+                            <th>說明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>最佳情況</strong></td>
+                            <td>O(n log n)</td>
+                            <td>每次選擇的 pivot 將數列均分</td>
+                        </tr>
+                        <tr>
+                            <td><strong>平均情況</strong></td>
+                            <td>O(n log n)</td>
+                            <td>隨機排列的數列</td>
+                        </tr>
+                        <tr>
+                            <td><strong>最壞情況</strong></td>
+                            <td>O(n²)</td>
+                            <td>數列已排序或逆序，pivot 總是最小或最大值</td>
+                        </tr>
+                        <tr>
+                            <td><strong>空間複雜度</strong></td>
+                            <td>O(log n)</td>
+                            <td>遞迴調用棧的深度</td>
+                        </tr>
+                        <tr>
+                            <td><strong>穩定性</strong></td>
+                            <td>不穩定</td>
+                            <td>相等元素的相對順序可能改變</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section>
+                <h2>優缺點分析</h2>
+
+                <div class="pros-cons">
+                    <div class="pros">
+                        <h4>✓ 優點</h4>
+                        <ul>
+                            <li>平均時間複雜度低，適合大規模數據</li>
+                            <li>原地排序，空間效率高</li>
+                            <li>遞迴實現簡單，易於理解</li>
+                        </ul>
+                    </div>
+                    <div class="cons">
+                        <h4>✗ 缺點</h4>
+                        <ul>
+                            <li>最壞情況時間複雜度高</li>
+                            <li>不穩定，可能改變相等元素的順序</li>
+                            <li>對小規模數據效率不如插入排序</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2>應用領域</h2>
+
+                <h3>適用場景</h3>
+                <ul>
+                    <li><strong>大規模數據</strong>：快速排序在數據量較大時表現優異</li>
+                    <li><strong>隨機排列數據</strong>：對隨機數據的平均性能穩定</li>
+                    <li><strong>內存有限</strong>：原地排序節省空間</li>
+                </ul>
+
+                <h3>不適用場景</h3>
+                <ul>
+                    <li><strong>小規模數據</strong>：插入排序可能更高效</li>
+                    <li><strong>實時系統</strong>：最壞情況可能導致性能瓶頸</li>
+                </ul>
+
+                <h3>實際應用示例</h3>
+                <div class="code-block">
+                    <pre><code>// 快速排序常用於一般用途排序，例如大多數自訂資料結構排序
+// 但在實作時會搭配隨機化 pivot 或使用 introsort 以避免最壞情況
+// 具體示例略—請參考上方 Python 範例作為基礎實作</code></pre>
+                </div>
+            </section>
+
+            <section>
+                <h2>與其他排序算法的比較</h2>
+
+                <table class="complexity-table">
+                    <thead>
+                        <tr>
+                            <th>算法名稱</th>
+                            <th>最佳情況</th>
+                            <th>平均情況</th>
+                            <th>最壞情況</th>
+                            <th>空間</th>
+                            <th>穩定性</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>快速排序</strong></td>
+                            <td>O(n log n)</td>
+                            <td>O(n log n)</td>
+                            <td>O(n²)</td>
+                            <td>O(log n)</td>
+                            <td>不穩定</td>
+                        </tr>
+                        <tr>
+                            <td><strong>歸併排序</strong></td>
+                            <td>O(n log n)</td>
+                            <td>O(n log n)</td>
+                            <td>O(n log n)</td>
+                            <td>O(n)</td>
+                            <td>穩定</td>
+                        </tr>
+                        <tr>
+                            <td><strong>堆排序</strong></td>
+                            <td>O(n log n)</td>
+                            <td>O(n log n)</td>
+                            <td>O(n log n)</td>
+                            <td>O(1)</td>
+                            <td>不穩定</td>
+                        </tr>
+                        <tr>
+                            <td><strong>插入排序</strong></td>
+                            <td>O(n)</td>
+                            <td>O(n²)</td>
+                            <td>O(n²)</td>
+                            <td>O(1)</td>
+                            <td>穩定</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section>
+                <h2>優化與應用</h2>
+                <table border="1" style="width:100%; border-collapse:collapse; text-align:center;">
+                    <thead>
+                        <tr>
+                            <th>分類</th>
+                            <th>內容</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>原理</td>
+                            <td>快速排序法基於分治法，選取樞紐（pivot）將資料分為兩部分，遞迴排序後合併。</td>
+                        </tr>
+                        <tr>
+                            <td>優點</td>
+                            <td>平均時間複雜度為 O(n log n)，適合大部分情況；原地排序，空間效率高。</td>
+                        </tr>
+                        <tr>
+                            <td>缺點</td>
+                            <td>最壞情況時間複雜度為 O(n²)，當資料接近有序時效率低。</td>
+                        </tr>
+                        <tr>
+                            <td>應用</td>
+                            <td>適用於需要高效排序的大型資料集，如數據分析、資料庫排序。</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section>
+                <h2>總結</h2>
+                <p>快速排序在平均情況下提供極佳性能且為原地排序，適合大多數一般用途；開發時宜採用隨機化或混合策略（如 introsort）以避免最壞情況，並在需要穩定性的場景選擇其他演算法。</p>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 排序算法學習中心 | 快速排序教學</p>
+            <a href="index.html" style="display:inline-block;margin-top:15px;padding:10px 24px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;border-radius:30px;text-decoration:none;font-weight:bold;">回到首頁</a>
+        </footer>
+    </div>
+
+    <script>
+        // 與插入排序相同的視覺化邏輯，但改為快速排序 (partition + 遞迴)
+        let array = [8,5,2,9,5,6,3];
+        let isAnimating = false;
+
+        function initVisualization() {
+            const barsContainer = document.getElementById('bars');
+            barsContainer.innerHTML = '';
+            array.forEach(num => {
+                const bar = document.createElement('div');
+                bar.className = 'bar';
+                bar.style.height = (num * 20) + 'px';
+                bar.textContent = num;
+                barsContainer.appendChild(bar);
+            });
+        }
+
+        function generateArray() {
+            if (isAnimating) return;
+            array = [];
+            for (let i = 0; i < 7; i++) array.push(Math.floor(Math.random() * 9) + 1);
+            initVisualization();
+            document.getElementById('stepInfo').textContent = '隨機數組已生成，點擊"開始排序"觀看演示';
+        }
+
+        function resetAnimation() {
+            if (isAnimating) return;
+            array = [8,5,2,9,5,6,3];
+            initVisualization();
+            document.getElementById('stepInfo').textContent = '已重置，準備就緒';
+        }
+
+        function getDelay() { return 400; }
+
+        async function partition(low, high) {
+            const bars = document.querySelectorAll('.bar');
+            let pivot = array[high];
+            bars[high].classList.add('pivot');
+            document.getElementById('stepInfo').textContent = `Partition: pivot=${pivot} 範圍 [${low}, ${high}]`;
+            await new Promise(r => setTimeout(r, getDelay()));
+
+            let i = low - 1;
+            for (let j = low; j < high; j++) {
+                bars[j].classList.add('highlight');
+                document.getElementById('stepInfo').textContent = `比較 ${array[j]} 與 pivot ${pivot}`;
+                await new Promise(r => setTimeout(r, getDelay()/2));
+                if (array[j] <= pivot) {
+                    i++;
+                    [array[i], array[j]] = [array[j], array[i]];
+                    bars[i].style.height = (array[i]*20) + 'px';
+                    bars[i].textContent = array[i];
+                    bars[j].style.height = (array[j]*20) + 'px';
+                    bars[j].textContent = array[j];
+                    document.getElementById('stepInfo').textContent = `交換位置 ${i} 與 ${j}`;
+                    await new Promise(r => setTimeout(r, getDelay()/2));
+                }
+                bars[j].classList.remove('highlight');
+            }
+
+            [array[i+1], array[high]] = [array[high], array[i+1]];
+            bars[i+1].style.height = (array[i+1]*20) + 'px';
+            bars[i+1].textContent = array[i+1];
+            bars[high].style.height = (array[high]*20) + 'px';
+            bars[high].textContent = array[high];
+            await new Promise(r => setTimeout(r, getDelay()));
+            document.querySelectorAll('.bar').forEach(b => b.classList.remove('pivot'));
+            return i+1;
+        }
+
+        async function quickSortVisual(low, high) {
+            if (low < high) {
+                const p = await partition(low, high);
+                document.querySelectorAll('.bar')[p].classList.add('sorted');
+                await quickSortVisual(low, p-1);
+                await quickSortVisual(p+1, high);
+            } else if (low === high) {
+                document.querySelectorAll('.bar')[low].classList.add('sorted');
+            }
+        }
+
+        async function startAnimation() {
+            if (isAnimating) return;
+            const input = document.getElementById('arrayInput').value.trim();
+            if (input) {
+                const parsed = input.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
+                if (parsed.length > 0) array = parsed;
+            }
+
+            initVisualization();
+            isAnimating = true;
+            document.getElementById('stepInfo').textContent = '開始快速排序...';
+            await quickSortVisual(0, array.length-1);
+            document.getElementById('stepInfo').textContent = '排序完成！';
+            isAnimating = false;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() { initVisualization(); });
+    </script>
+</body>
+</html>

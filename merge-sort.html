@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>歸併排序法 - 原理與應用</title>
+    <title>合併排序法 - 原理與應用</title>
     <style>
         * {
             margin: 0;
@@ -23,7 +23,7 @@
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            background: white;
+            background: linear-gradient(180deg, #fffaf0 0%, #fff6ee 100%);
             border-radius: 10px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
             overflow: hidden;
@@ -84,7 +84,7 @@
         }
 
         .code-block {
-            background: #f5f5f5;
+            background: #fff7f0;
             border-left: 4px solid #667eea;
             padding: 15px;
             margin: 15px 0;
@@ -121,7 +121,7 @@
         }
 
         .complexity-table tr:nth-child(even) {
-            background: #f9f9f9;
+            background: #fff8f2;
         }
 
         .complexity-table tr:hover {
@@ -351,24 +351,24 @@
 <body>
     <div class="container">
         <header>
-            <h1>🔀 歸併排序法</h1>
+            <h1>🔀 合併排序法</h1>
             <p>Merge Sort - 分治策略與穩定排序實作</p>
         </header>
 
         <main>
             <section>
                 <h2>算法原理</h2>
-                <p>歸併排序（Merge Sort）是一種基於分治思想的排序算法。它將原始數列不斷分割成更小的子序列，對子序列進行排序，然後再將已排序的子序列合併成完整的有序序列。</p>
+                <p>合併排序（Merge Sort）是一種基於分治思想的排序算法。它將原始數列不斷分割成更小的子序列，對子序列進行排序，然後再將已排序的子序列合併成完整的有序序列。</p>
 
                 <h3>分治思想</h3>
                 <ol>
                     <li>將數列從中間切分為左右兩個子序列</li>
-                    <li>遞歸地對左右子序列進行歸併排序</li>
+                    <li>遞歸地對左右子序列進行合併排序</li>
                     <li>將兩個已排序的子序列合併成一個有序序列</li>
                 </ol>
 
                 <h3>穩定性</h3>
-                <p>歸併排序是一種穩定排序算法，因為在合併過程中遇到兩個相等元素時，通常會保持它們原本的相對順序。</p>
+                <p>合併排序是一種穩定排序算法，因為在合併過程中遇到兩個相等元素時，通常會保持它們原本的相對順序。</p>
             </section>
 
             <section>
@@ -406,12 +406,16 @@ algorithm Merge(left, right)
 
             <section>
                 <h2>動畫模擬</h2>
-                <p>以下模擬展示歸併排序如何拆分陣列並逐步合併。請點擊「開始模擬」以觀看過程。</p>
+                <p>以下模擬展示合併排序如何拆分陣列並逐步合併。你可以自訂數列或產生隨機數列，然後點擊「開始模擬」觀看過程。</p>
+                <div style="text-align:center;margin-bottom:18px;">
+                    <input id="customArrayInput" type="text" placeholder="請輸入數列（如：7,3,5,1,9,4）" style="width:260px;padding:8px 12px;border-radius:6px;border:1px solid #ccc;font-size:1em;">
+                    <button id="setArrayBtn" class="btn btn-secondary" style="padding:8px 18px;font-size:1em;margin-left:8px;">設定數列</button>
+                </div>
                 <div class="animation-container" id="animationArray"></div>
-                <div class="step-info" id="stepInfo">按下「開始模擬」以觀看歸併排序拆分與合併的每個步驟。</div>
+                <div class="step-info" id="stepInfo">按下「開始模擬」以觀看合併排序拆分與合併的每個步驟。</div>
                 <div class="speed-control">
                     <label for="speed">速度：</label>
-                    <input type="range" id="speed" min="100" max="1000" step="50" value="700">
+                    <input type="range" id="speed" min="50" max="2000" step="50" value="700">
                     <span id="speedLabel">中等</span>
                 </div>
                 <div class="controls">
@@ -526,7 +530,7 @@ int main() {
 
             <section>
                 <h2>應用場景</h2>
-                <p>歸併排序適用於需要穩定排序或大量資料處理的情境。典型應用包括：</p>
+                <p>合併排序適用於需要穩定排序或大量資料處理的情境。典型應用包括：</p>
                 <ul>
                     <li>大規模資料庫排序與外部排序</li>
                     <li>合併多個已排序清單</li>
@@ -538,8 +542,8 @@ int main() {
             <section>
                 <h2>總結</h2>
                 <div class="summary">
-                    <p>歸併排序是一種穩定且時間複雜度穩定的排序算法。它特別適合大型資料集與已排序子列的合併操作，但需要額外的暫存空間。</p>
-                    <p>透過分治策略，歸併排序將問題拆解為更簡單的子問題，再將結果組合回來，這使得它在處理複雜資料時更具可預測性。</p>
+                    <p>合併排序是一種穩定且時間複雜度穩定的排序算法。它特別適合大型資料集與已排序子列的合併操作，但需要額外的暫存空間。</p>
+                    <p>透過分治策略，合併排序將問題拆解為更簡單的子問題，再將結果組合回來，這使得它在處理複雜資料時更具可預測性。</p>
                 </div>
             </section>
 
@@ -547,6 +551,11 @@ int main() {
                 <a href="index.html" class="btn">返回首頁</a>
             </div>
         </main>
+        <footer style="text-align:center;margin-top:20px;">
+            <p>&copy; 2026 排序算法學習中心 | 合併排序法完全指南</p>
+            <a href="index.html" style="display:inline-block;margin-top:15px;padding:10px 24px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;border-radius:30px;text-decoration:none;font-weight:bold;transition:background 0.3s;">回到首頁</a>
+        </footer>
+    </div>
     </div>
     <script>
         let data = [7, 3, 5, 1, 9, 4];
@@ -558,6 +567,24 @@ int main() {
         const speedInput = document.getElementById('speed');
         const speedLabel = document.getElementById('speedLabel');
         const stepInfo = document.getElementById('stepInfo');
+        const customArrayInput = document.getElementById('customArrayInput');
+        const setArrayBtn = document.getElementById('setArrayBtn');
+                function setCustomArray() {
+                    if (isAnimating) return;
+                    const val = customArrayInput.value.trim();
+                    if (!val) {
+                        stepInfo.textContent = '請輸入數列（如：7,3,5,1,9,4）';
+                        return;
+                    }
+                    const arr = val.split(',').map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n));
+                    if (arr.length === 0) {
+                        stepInfo.textContent = '格式錯誤，請用逗號分隔數字';
+                        return;
+                    }
+                    data = arr;
+                    initVisualization();
+                    stepInfo.textContent = '自訂數列已設定，點擊「開始模擬」觀看演示。';
+                }
         let frames = [];
         let timeoutIds = [];
         let speed = Number(speedInput.value);
@@ -713,19 +740,22 @@ int main() {
         }
 
         function getDelay() {
-            return 1100 - speed;
+            // 速度條越大，延遲越大
+            return speed;
         }
 
         function updateSpeedLabel() {
             const value = speed;
-            if (value <= 250) {
-                speedLabel.textContent = '超快';
-            } else if (value <= 500) {
+            if (value <= 150) {
+                speedLabel.textContent = '極快';
+            } else if (value <= 400) {
                 speedLabel.textContent = '快速';
-            } else if (value <= 750) {
+            } else if (value <= 900) {
                 speedLabel.textContent = '中等';
-            } else {
+            } else if (value <= 1500) {
                 speedLabel.textContent = '緩慢';
+            } else {
+                speedLabel.textContent = '極慢';
             }
         }
 
@@ -744,11 +774,10 @@ int main() {
             timeoutIds = [];
             const arrCopy = [...data];
             mergeSortAnimate(arrCopy, 0, arrCopy.length - 1);
-
             const delay = getDelay();
             frames.forEach((frame, index) => {
                 const id = setTimeout(() => {
-                    renderFrame(frame);
+                    renderFrame(frame, index);
                     if (index === frames.length - 1) {
                         isAnimating = false;
                         setButtonsDisabled(false);
@@ -757,6 +786,8 @@ int main() {
                 }, index * delay);
                 timeoutIds.push(id);
             });
+            // 初始顯示步驟分解
+            updateStepBreakdown(0);
         }
 
         function resetAnimation() {
@@ -765,6 +796,7 @@ int main() {
             timeoutIds = [];
             data = [7, 3, 5, 1, 9, 4];
             initVisualization();
+            updateStepBreakdown(0);
         }
 
         function generateArray() {
@@ -782,6 +814,10 @@ int main() {
         startBtn.addEventListener('click', startAnimation);
         resetBtn.addEventListener('click', resetAnimation);
         generateBtn.addEventListener('click', generateArray);
+        setArrayBtn.addEventListener('click', setCustomArray);
+        customArrayInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') setCustomArray();
+        });
 
         document.addEventListener('DOMContentLoaded', function() {
             updateSpeedLabel();

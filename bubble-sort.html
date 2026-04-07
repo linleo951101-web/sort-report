@@ -23,7 +23,8 @@
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            background: white;
+            /* 暖色系容器底色 */
+            background: linear-gradient(180deg, #fffaf0 0%, #fff6ee 100%);
             border-radius: 10px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
             overflow: hidden;
@@ -84,7 +85,7 @@
         }
 
         .code-block {
-            background: #f5f5f5;
+            background: #fff7f0;
             border-left: 4px solid #667eea;
             padding: 15px;
             margin: 15px 0;
@@ -102,7 +103,7 @@
         }
 
         .visualization {
-            background: #f9f9f9;
+            background: #fff8f2;
             border: 2px solid #667eea;
             padding: 20px;
             border-radius: 8px;
@@ -199,7 +200,7 @@
         }
 
         .complexity-table tr:nth-child(even) {
-            background: #f9f9f9;
+            background: #fff8f2;
         }
 
         .complexity-table tr:hover {
@@ -275,11 +276,11 @@
         }
 
         footer {
-            background: #f5f5f5;
+            background: #fff7f0;
             padding: 20px;
             text-align: center;
             color: #666;
-            border-top: 1px solid #ddd;
+            border-top: 1px solid #efe0d6;
         }
 
         @media (max-width: 768px) {
@@ -614,72 +615,7 @@ void sortStudents(Student students[], int n) {
             </section>
 
             <!-- 與其他排序算法的比較 -->
-            <section>
-                <h2>與其他排序算法的比較</h2>
-
-                <table class="complexity-table">
-                    <thead>
-                        <tr>
-                            <th>算法名稱</th>
-                            <th>最佳情況</th>
-                            <th>平均情況</th>
-                            <th>最壞情況</th>
-                            <th>空間</th>
-                            <th>穩定性</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>氣泡排序</strong></td>
-                            <td>O(n)</td>
-                            <td>O(n²)</td>
-                            <td>O(n²)</td>
-                            <td>O(1)</td>
-                            <td>穩定</td>
-                        </tr>
-                        <tr>
-                            <td><strong>選擇排序</strong></td>
-                            <td>O(n²)</td>
-                            <td>O(n²)</td>
-                            <td>O(n²)</td>
-                            <td>O(1)</td>
-                            <td>不穩定</td>
-                        </tr>
-                        <tr>
-                            <td><strong>插入排序</strong></td>
-                            <td>O(n)</td>
-                            <td>O(n²)</td>
-                            <td>O(n²)</td>
-                            <td>O(1)</td>
-                            <td>穩定</td>
-                        </tr>
-                        <tr>
-                            <td><strong>快速排序</strong></td>
-                            <td>O(n log n)</td>
-                            <td>O(n log n)</td>
-                            <td>O(n²)</td>
-                            <td>O(log n)</td>
-                            <td>不穩定</td>
-                        </tr>
-                        <tr>
-                            <td><strong>歸併排序</strong></td>
-                            <td>O(n log n)</td>
-                            <td>O(n log n)</td>
-                            <td>O(n log n)</td>
-                            <td>O(n)</td>
-                            <td>穩定</td>
-                        </tr>
-                        <tr>
-                            <td><strong>堆排序</strong></td>
-                            <td>O(n log n)</td>
-                            <td>O(n log n)</td>
-                            <td>O(n log n)</td>
-                            <td>O(1)</td>
-                            <td>不穩定</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </section>
+            <!-- 已刪除「與其他排序算法的比較」區塊 -->
 
             <!-- 總結 -->
             <section>
@@ -702,6 +638,7 @@ void sortStudents(Student students[], int n) {
         <footer>
             <p>&copy; 2026 排序算法學習中心 | 氣泡排序法完全指南</p>
             <p>本文檔提供了氣泡排序的原理、實現和應用說明</p>
+            <a href="index.html" style="display:inline-block;margin-top:15px;padding:10px 24px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;border-radius:30px;text-decoration:none;font-weight:bold;transition:background 0.3s;">回到首頁</a>
         </footer>
     </div>
 
