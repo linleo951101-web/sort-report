@@ -2,7 +2,7 @@
 
 學號: １１４２８２３０  
 姓名: 林晉愷  
-模擬頁面:https://vscode.dev/github/linleo951101-web/sort-report/blob/main/index.html 
+模擬頁面:https://github.com/linleo951101-web/sort-report/blob/main/index.html
 
 ---
 
