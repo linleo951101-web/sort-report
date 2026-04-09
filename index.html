@@ -5,6 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>排序演算法實驗室 - 首頁</title>
     <style>
+        :root {
+            --ink-strong: #1f2937;
+            --ink-soft: #4b5563;
+            --brand-1: #3b82f6;
+            --brand-2: #0ea5a4;
+            --brand-3: #6366f1;
+            --surface-soft: #fff8ef;
+            --surface-card: #fffdf8;
+            --radius-lg: 16px;
+            --shadow-soft: 0 8px 24px rgba(15, 23, 42, 0.12);
+            --shadow-strong: 0 16px 40px rgba(15, 23, 42, 0.2);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -15,9 +28,10 @@
             font-family: 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif;
             line-height: 1.6;
             color: #f3f4f6;
-            /* 更柔和且有層次的背景：深色底 + 漸層光暈 */
-            background: radial-gradient(ellipse at 10% 10%, rgba(124,58,237,0.12), transparent 20%),
-                        linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #7c3aed 100%);
+            background:
+                radial-gradient(ellipse at 8% 10%, rgba(56, 189, 248, 0.18), transparent 28%),
+                radial-gradient(ellipse at 88% 0%, rgba(20, 184, 166, 0.12), transparent 26%),
+                linear-gradient(135deg, #0b1220 0%, #102b43 52%, #12355a 100%);
             background-attachment: fixed;
             min-height: 100vh;
             overflow-x: hidden;
@@ -33,7 +47,7 @@
         nav {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
-            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
             position: fixed;
             top: 0;
             width: 100%;
@@ -43,29 +57,66 @@
 
         nav.scrolled {
             background: rgba(255, 255, 255, 0.98);
-            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14);
         }
 
         nav .container {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 20px;
+            padding: 14px 20px;
+            transition: padding 0.28s ease;
+        }
+
+        nav.scrolled .container {
+            padding: 10px 20px;
         }
 
         .logo {
             font-size: 1.5em;
             font-weight: bold;
-            color: #667eea;
+            color: var(--brand-3);
             text-decoration: none;
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
-        .logo::before {
-            content: "🎯";
-            font-size: 1.8em;
+        .logo-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 3px;
+            padding: 5px 5px 4px;
+            background: linear-gradient(160deg, rgba(59, 130, 246, 0.16), rgba(14, 165, 164, 0.2));
+            border: 1px solid rgba(59, 130, 246, 0.25);
+            position: relative;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+        }
+
+        .logo-icon .bar {
+            width: 5px;
+            border-radius: 3px 3px 1px 1px;
+            background: linear-gradient(180deg, #4ca2ff, #2962d9);
+        }
+
+        .logo-icon .b1 { height: 10px; }
+        .logo-icon .b2 { height: 14px; }
+        .logo-icon .b3 { height: 18px; }
+        .logo-icon .b4 { height: 22px; }
+
+        .logo-icon .arrow {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 8px;
+            height: 8px;
+            border-top: 2px solid #1d4ed8;
+            border-right: 2px solid #1d4ed8;
+            transform: rotate(45deg);
         }
 
         nav ul {
@@ -74,30 +125,36 @@
             gap: 30px;
         }
 
-        nav a {
-            color: #333;
+        nav ul a {
+            color: #334155;
             text-decoration: none;
-            font-weight: 500;
+            font-weight: 600;
             transition: color 0.3s ease;
             position: relative;
+            padding-bottom: 4px;
         }
 
-        nav a:hover {
-            color: #667eea;
+        nav ul a:hover {
+            color: var(--brand-3);
         }
 
-        nav a::after {
+        nav ul a.active {
+            color: var(--brand-3);
+        }
+
+        nav ul a::after {
             content: '';
             position: absolute;
             width: 0;
             height: 2px;
             bottom: -5px;
             left: 0;
-            background: #667eea;
+            background: linear-gradient(90deg, var(--brand-1), var(--brand-3));
             transition: width 0.3s ease;
         }
 
-        nav a:hover::after {
+        nav ul a:hover::after,
+        nav ul a.active::after {
             width: 100%;
         }
 
@@ -108,7 +165,7 @@
 
         .hero {
             text-align: center;
-            padding: 100px 0;
+            padding: 112px 0 98px;
             color: white;
             position: relative;
         }
@@ -127,41 +184,75 @@
         .hero-content {
             position: relative;
             z-index: 1;
+            max-width: 860px;
+            margin: 0 auto;
+        }
+
+        .hero-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border-radius: 999px;
+            border: 1px solid rgba(148, 222, 255, 0.45);
+            background: rgba(6, 45, 79, 0.5);
+            color: #d6f0ff;
+            padding: 8px 14px;
+            margin-bottom: 18px;
+            font-size: 0.95em;
         }
 
         .hero h1 {
-            font-size: 3.5em;
-            margin-bottom: 20px;
+            font-size: 3.2em;
+            margin-bottom: 16px;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
             animation: fadeInUp 1s ease-out;
+            line-height: 1.26;
         }
 
         .hero p {
-            font-size: 1.3em;
-            margin-bottom: 40px;
-            opacity: 0.9;
+            font-size: 1.2em;
+            margin-bottom: 34px;
+            color: #d5ebff;
             animation: fadeInUp 1s ease-out 0.2s both;
         }
 
         .hero-buttons {
             display: flex;
-            gap: 20px;
+            gap: 14px;
             justify-content: center;
             flex-wrap: wrap;
             animation: fadeInUp 1s ease-out 0.4s both;
+            margin-bottom: 18px;
+        }
+
+        .hero-meta {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            animation: fadeInUp 1s ease-out 0.55s both;
+        }
+
+        .hero-chip {
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(9, 52, 89, 0.5);
+            border: 1px solid rgba(148, 222, 255, 0.35);
+            color: #d8efff;
+            font-size: 0.9em;
         }
 
         .btn {
             display: inline-block;
-            padding: 15px 30px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            padding: 14px 28px;
+            background: linear-gradient(135deg, var(--brand-1), var(--brand-3));
             color: white;
             text-decoration: none;
             border-radius: 50px;
             font-weight: 600;
-            font-size: 1.1em;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            font-size: 1em;
+            transition: transform 0.26s ease, box-shadow 0.26s ease, background 0.26s ease;
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
             position: relative;
             overflow: hidden;
         }
@@ -182,29 +273,30 @@
         }
 
         .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px rgba(37, 99, 235, 0.42);
         }
 
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.14);
             backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(219, 237, 255, 0.45);
+            box-shadow: 0 5px 14px rgba(9, 44, 76, 0.35);
         }
 
         .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.22);
         }
 
         /* 特色區域（暖色系背景） */
         .features {
             padding: 80px 0;
-            background: linear-gradient(180deg, #fffaf0 0%, #fff0e6 100%);
+            background: linear-gradient(180deg, #fffdf7 0%, #fff4e9 100%);
         }
 
         .features h2 {
             text-align: center;
-            color: #333;
+            color: var(--ink-strong);
             margin-bottom: 60px;
             font-size: 2.5em;
             position: relative;
@@ -218,7 +310,7 @@
             transform: translateX(-50%);
             width: 80px;
             height: 4px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, var(--brand-1), var(--brand-2));
             border-radius: 2px;
         }
 
@@ -230,14 +322,15 @@
         }
 
         .feature-card {
-            background: #fff5ee;
+            background: var(--surface-card);
             padding: 40px 30px;
-            border-radius: 15px;
+            border-radius: var(--radius-lg);
             text-align: center;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.26s ease, box-shadow 0.26s ease, border-color 0.26s ease;
+            box-shadow: var(--shadow-soft);
             position: relative;
             overflow: hidden;
+            border: 1px solid rgba(59, 130, 246, 0.08);
         }
 
         .feature-card::before {
@@ -247,7 +340,7 @@
             left: 0;
             right: 0;
             height: 4px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, var(--brand-1), var(--brand-2));
             transform: scaleX(0);
             transition: transform 0.3s ease;
         }
@@ -257,8 +350,9 @@
         }
 
         .feature-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-strong);
+            border-color: rgba(59, 130, 246, 0.25);
         }
 
         .feature-icon {
@@ -268,20 +362,20 @@
         }
 
         .feature-card h3 {
-            color: #333;
+            color: var(--ink-strong);
             margin-bottom: 15px;
             font-size: 1.5em;
         }
 
         .feature-card p {
-            color: #666;
+            color: var(--ink-soft);
             line-height: 1.6;
         }
 
         /* 統計區域 */
         .stats {
             padding: 80px 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1d4ed8 0%, #0f766e 100%);
             color: white;
         }
 
@@ -329,7 +423,7 @@
         }
 
         .footer-section h3 {
-            color: #667eea;
+            color: #8bc4ff;
             margin-bottom: 20px;
             font-size: 1.3em;
         }
@@ -349,7 +443,7 @@
         }
 
         .footer-section a:hover {
-            color: #667eea;
+            color: #8bc4ff;
         }
 
         .footer-bottom {
@@ -383,6 +477,10 @@
             .hero-buttons {
                 flex-direction: column;
                 align-items: center;
+            }
+
+            .hero-meta {
+                gap: 8px;
             }
 
             nav .container {
@@ -481,9 +579,18 @@
     <!-- 導航欄 -->
     <nav id="navbar">
         <div class="container">
-            <a href="#" class="logo">排序演算法實驗室</a>
+            <a href="#home" class="logo">
+                <span class="logo-icon" aria-hidden="true">
+                    <span class="bar b1"></span>
+                    <span class="bar b2"></span>
+                    <span class="bar b3"></span>
+                    <span class="bar b4"></span>
+                    <span class="arrow"></span>
+                </span>
+                <span>排序演算法實驗室</span>
+            </a>
             <ul>
-                <li><a href="#home">首頁</a></li>
+                <li><a href="#home" class="active">首頁</a></li>
                 <li><a href="#features">特色</a></li>
                 <li><a href="#algorithms">排序介紹</a></li>
             </ul>
@@ -496,11 +603,17 @@
         <section class="hero" id="home">
             <div class="container">
                 <div class="hero-content">
-                    <h1>探索算法世界</h1>
-                    <p>從基礎排序算法開始，掌握編程的核心技能</p>
+                    <span class="hero-tag">排序學習平台 2.0 · 從理解到實作一站式完成</span>
+                    <h1>不只背演算法，真正看懂每一步排序決策</h1>
+                    <p>從原理、視覺化到實戰案例，快速建立你在排序演算法上的完整判斷力與實作能力。</p>
                     <div class="hero-buttons">
-                        <a href="bubble-sort.html" class="btn">查看氣泡排序</a>
-                        <a href="#features" class="btn btn-secondary">了解更多</a>
+                        <a href="visual-demo.html" class="btn">立即體驗視覺化演示</a>
+                        <a href="systematic-learning.html" class="btn btn-secondary">查看系統學習路線</a>
+                    </div>
+                    <div class="hero-meta">
+                        <span class="hero-chip">6 大核心排序主題</span>
+                        <span class="hero-chip">可互動動畫演示</span>
+                        <span class="hero-chip">實戰應用與總結</span>
                     </div>
                 </div>
             </div>
@@ -515,11 +628,13 @@
                         <span class="feature-icon">📚</span>
                         <h3>系統化學習</h3>
                         <p>從基礎到進階，循序漸進地掌握算法知識。提供清晰的理論解釋和實作指導。</p>
+                        <a href="systematic-learning.html" class="btn" style="margin-top: 20px; padding: 10px 20px; font-size: 0.9em;">開始規劃</a>
                     </div>
                     <div class="feature-card fade-in">
                         <span class="feature-icon">💻</span>
                         <h3>代碼實作</h3>
                         <p>提供多種編程語言的完整代碼實現，包括 C、C++、Java 等主流語言。</p>
+                        <a href="code-implementation.html" class="btn" style="margin-top: 20px; padding: 10px 20px; font-size: 0.9em;">前往代碼實作</a>
                     </div>
                     <div class="feature-card fade-in">
                         <span class="feature-icon">📊</span>
@@ -531,16 +646,19 @@
                         <span class="feature-icon">🎯</span>
                         <h3>實戰應用</h3>
                         <p>結合實際應用場景，學習如何在現實項目中應用各種排序算法。</p>
+                        <a href="practical-application.html" class="btn" style="margin-top: 20px; padding: 10px 20px; font-size: 0.9em;">查看實戰案例</a>
                     </div>
                     <div class="feature-card fade-in">
                         <span class="feature-icon">🔍</span>
                         <h3>視覺化演示</h3>
                         <p>通過動畫和圖表，直觀展示算法的執行過程，加深理解。</p>
+                        <a href="visual-demo.html" class="btn" style="margin-top: 20px; padding: 10px 20px; font-size: 0.9em;">立即體驗</a>
                     </div>
                     <div class="feature-card fade-in">
                         <span class="feature-icon">🏆</span>
-                        <h3>進階挑戰</h3>
-                        <p>提供算法優化練習和競賽級題目，提升編程技能和解題能力。</p>
+                        <h3>心得與結論</h3>
+                        <p>整理學習重點、實作反思與最終結論，快速掌握排序演算法的選型思路。</p>
+                        <a href="reflection-conclusion.html" class="btn" style="margin-top: 20px; padding: 10px 20px; font-size: 0.9em;">閱讀總結</a>
                     </div>
                 </div>
             </div>
@@ -611,7 +729,7 @@
                         <span class="feature-icon">🏗️</span>
                         <h3>堆排序</h3>
                         <p>利用堆數據結構實現的排序算法，具有良好的最壞情況性能。</p>
-                        <!-- 已移除無效連結 即將推出 -->
+                        <a href="heap-sort.html" class="btn" style="margin-top: 20px; padding: 10px 20px; font-size: 0.9em;">立即學習</a>
                     </div>
                 </div>
             </div>
@@ -629,6 +747,7 @@
                 <div class="footer-section">
                     <h3>學習資源</h3>
                     <ul>
+                        <li><a href="systematic-learning.html">系統性學習路線</a></li>
                         <li><a href="bubble-sort.html">氣泡排序詳解</a></li>
                         <li><a href="merge-sort.html">合併排序詳解</a></li>
                         <li><a href="performance-analysis.html">時間複雜度分析</a></li>
@@ -660,12 +779,34 @@
         // 導航欄滾動效果
         window.addEventListener('scroll', function() {
             const navbar = document.getElementById('navbar');
-            if (window.scrollY > 50) {
+            if (window.scrollY > 30) {
                 navbar.classList.add('scrolled');
             } else {
                 navbar.classList.remove('scrolled');
             }
         });
+
+        // 導航列區段高亮
+        const navLinks = document.querySelectorAll('nav ul a[href^="#"]');
+        const navSections = Array.from(navLinks)
+            .map(link => document.querySelector(link.getAttribute('href')))
+            .filter(Boolean);
+
+        const navObserver = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const currentId = '#' + entry.target.id;
+                    navLinks.forEach(link => {
+                        link.classList.toggle('active', link.getAttribute('href') === currentId);
+                    });
+                }
+            });
+        }, {
+            threshold: 0.55,
+            rootMargin: '-80px 0px -30% 0px'
+        });
+
+        navSections.forEach(section => navObserver.observe(section));
 
         // 滾動動畫
         const observerOptions = {
@@ -734,17 +875,6 @@
         }, { threshold: 0.5 });
 
         statsObserver.observe(statsSection);
-
-        // 添加一些互動效果
-        document.querySelectorAll('.feature-card').forEach(card => {
-            card.addEventListener('mouseenter', function() {
-                this.style.transform = 'translateY(-10px) scale(1.02)';
-            });
-
-            card.addEventListener('mouseleave', function() {
-                this.style.transform = 'translateY(0) scale(1)';
-            });
-        });
     </script>
 </body>
 </html>

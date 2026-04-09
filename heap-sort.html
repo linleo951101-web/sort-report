@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>快速排序法 - 原理與應用</title>
+    <title>堆排序法 - 原理與應用</title>
     <style>
         * {
             margin: 0;
@@ -16,9 +16,9 @@
             line-height: 1.6;
             color: #333;
             background:
-                radial-gradient(circle at 10% 20%, rgba(255, 206, 150, 0.35) 0%, transparent 35%),
-                radial-gradient(circle at 85% 10%, rgba(255, 142, 124, 0.28) 0%, transparent 32%),
-                linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
+                radial-gradient(circle at 12% 18%, rgba(149, 214, 255, 0.34) 0%, transparent 34%),
+                radial-gradient(circle at 88% 12%, rgba(153, 246, 228, 0.26) 0%, transparent 30%),
+                linear-gradient(135deg, #1f4e5f 0%, #102a43 100%);
             padding: 20px;
             min-height: 100vh;
         }
@@ -26,7 +26,7 @@
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            background: linear-gradient(180deg, #fffdf8 0%, #fff8f0 100%);
+            background: linear-gradient(180deg, #fbfffe 0%, #f5fbff 100%);
             border-radius: 14px;
             box-shadow: 0 14px 42px rgba(0, 0, 0, 0.28);
             overflow: hidden;
@@ -34,7 +34,7 @@
         }
 
         header {
-            background: linear-gradient(135deg, #355c7d 0%, #6c5b7b 45%, #c06c84 100%);
+            background: linear-gradient(135deg, #1f4e5f 0%, #227c9d 48%, #17c3b2 100%);
             color: white;
             padding: 44px 20px;
             text-align: center;
@@ -48,7 +48,7 @@
             right: 0;
             bottom: 0;
             height: 6px;
-            background: linear-gradient(90deg, #ffd166, #f28f3b, #ef476f);
+            background: linear-gradient(90deg, #ffd166, #17c3b2, #6ecbff);
         }
 
         header h1 {
@@ -70,15 +70,15 @@
         }
 
         h2 {
-            color: #355c7d;
-            border-bottom: 3px solid #355c7d;
+            color: #1f4e5f;
+            border-bottom: 3px solid #1f4e5f;
             padding-bottom: 10px;
             margin-bottom: 20px;
             font-size: 1.8em;
         }
 
         h3 {
-            color: #6c5b7b;
+            color: #227c9d;
             margin-top: 20px;
             margin-bottom: 10px;
             font-size: 1.3em;
@@ -99,8 +99,8 @@
         }
 
         .code-block {
-            background: #fff5ef;
-            border-left: 4px solid #355c7d;
+            background: #edf9ff;
+            border-left: 4px solid #1f4e5f;
             padding: 15px;
             margin: 15px 0;
             border-radius: 6px;
@@ -109,7 +109,7 @@
 
         code {
             font-family: 'Courier New', monospace;
-            color: #8a2d3b;
+            color: #124559;
         }
 
         pre code {
@@ -117,13 +117,13 @@
         }
 
         .visualization {
-            background: #fbfbfb;
-            border: 2px solid #355c7d;
+            background: #fbfeff;
+            border: 2px solid #1f4e5f;
             padding: 22px;
             border-radius: 10px;
             margin: 20px 0;
             text-align: center;
-            box-shadow: inset 0 0 0 1px rgba(53, 92, 125, 0.08);
+            box-shadow: inset 0 0 0 1px rgba(31, 78, 95, 0.08);
         }
 
         .bars {
@@ -135,12 +135,12 @@
             margin: 20px 0;
             padding: 10px;
             border-radius: 8px;
-            background: linear-gradient(180deg, #f6f9ff 0%, #eef2ff 100%);
+            background: linear-gradient(180deg, #f0fbff 0%, #e8f6ff 100%);
             overflow-x: auto;
         }
 
         .bar {
-            background: linear-gradient(180deg, #355c7d, #6c5b7b);
+            background: linear-gradient(180deg, #227c9d, #1f4e5f);
             border-radius: 6px 6px 0 0;
             transition: all 0.28s ease;
             position: relative;
@@ -159,7 +159,7 @@
             transform: translateY(-3px);
         }
 
-        .bar.pivot {
+        .bar.root {
             background: linear-gradient(180deg, #ffd166, #f7b801);
             box-shadow: 0 0 12px rgba(247, 184, 1, 0.45);
         }
@@ -175,7 +175,7 @@
         }
 
         button {
-            background: linear-gradient(135deg, #355c7d, #6c5b7b);
+            background: linear-gradient(135deg, #1f4e5f, #227c9d);
             color: white;
             border: none;
             padding: 10px 20px;
@@ -188,7 +188,7 @@
 
         button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 16px rgba(53, 92, 125, 0.4);
+            box-shadow: 0 5px 16px rgba(31, 78, 95, 0.4);
         }
 
         button:active {
@@ -220,17 +220,17 @@
         }
 
         .complexity-table th {
-            background: #355c7d;
+            background: #1f4e5f;
             color: white;
             font-weight: bold;
         }
 
         .complexity-table tr:nth-child(even) {
-            background: #fff8f2;
+            background: #f4fbff;
         }
 
         .complexity-table tr:hover {
-            background: #f0f0f0;
+            background: #eef4f8;
         }
 
         .pros-cons {
@@ -266,7 +266,7 @@
 
         .example-step {
             background: #e7f3ff;
-            border-left: 4px solid #355c7d;
+            border-left: 4px solid #227c9d;
             padding: 15px;
             margin: 10px 0;
             border-radius: 5px;
@@ -274,7 +274,7 @@
 
         .step-info {
             background: #f0f8ff;
-            border: 1px solid #355c7d;
+            border: 1px solid #227c9d;
             padding: 10px;
             margin: 10px 0;
             border-radius: 5px;
@@ -333,8 +333,8 @@
 <body>
     <div class="container">
         <header>
-            <h1>⚡ 快速排序法</h1>
-            <p>Quick Sort - 分治策略的高效排序演算法</p>
+            <h1>🏗️ 堆排序法</h1>
+            <p>Heap Sort - 以最大堆維持高效率的就地排序演算法</p>
         </header>
 
         <main>
@@ -342,49 +342,48 @@
                 <h2>算法原理</h2>
 
                 <h3>基本概念</h3>
-                <p>快速排序（Quick Sort）是一種經典的分治法排序演算法。其核心概念是選取一個樞紐值（pivot），將資料重排成「小於等於 pivot」與「大於 pivot」兩部分，再對左右子陣列遞迴執行相同操作，最終完成整體排序。</p>
+                <p>堆排序（Heap Sort）利用二元堆（Binary Heap）結構進行排序。常見做法是先建立「最大堆」，使根節點始終為目前最大值，接著反覆把根節點與堆尾交換並縮小堆範圍，再重新維持堆性質，直到全部有序。</p>
 
                 <h3>工作原理</h3>
                 <ol>
-                    <li><strong>選擇樞紐</strong>：通常可選第一個、最後一個或隨機元素作為 pivot</li>
-                    <li><strong>分區（Partition）</strong>：將陣列調整為左側元素不大於 pivot，右側元素大於 pivot</li>
-                    <li><strong>遞迴排序</strong>：對 pivot 左右兩側子陣列重複分區</li>
-                    <li><strong>終止條件</strong>：當子陣列長度為 0 或 1，即視為已排序</li>
-                    <li><strong>完成合併</strong>：由遞迴回傳後，整個陣列即為有序狀態</li>
+                    <li><strong>建堆（Build Heap）</strong>：由最後一個非葉節點開始，往前做 heapify，建立最大堆</li>
+                    <li><strong>取出最大值</strong>：將堆頂（最大值）與當前堆尾交換</li>
+                    <li><strong>縮小堆大小</strong>：已放到尾端的元素視為排序完成</li>
+                    <li><strong>重新堆化</strong>：對新根節點做 heapify，恢復最大堆</li>
+                    <li><strong>重複直到完成</strong>：堆大小降到 1 時，整體排序完成</li>
                 </ol>
 
                 <h3>算法步驟</h3>
                 <div class="code-block">
-                    <pre><code>algorithm QuickSort(array, low, high)
-    if low < high
-        pivotIndex = Partition(array, low, high)
-        QuickSort(array, low, pivotIndex - 1)
-        QuickSort(array, pivotIndex + 1, high)
-    end if
+                    <pre><code>algorithm HeapSort(array)
+    buildMaxHeap(array)
+    for end from n - 1 downto 1
+        swap array[0], array[end]
+        heapify(array, 0, end)
+    end for
 end algorithm</code></pre>
                 </div>
 
                 <h3>具體例子</h3>
-                <p>對數列 [6, 3, 9, 1, 8, 2, 7] 進行排序（以最後一個元素為 pivot）：</p>
+                <p>對數列 [6, 3, 9, 1, 8, 2, 7] 進行堆排序：</p>
 
                 <div class="example-step">
                     <strong>初始數列：</strong> [6, 3, 9, 1, 8, 2, 7]<br>
-                    pivot = 7，待分區
+                    先建立最大堆
                 </div>
 
                 <div class="example-step">
-                    <strong>第一步：</strong> 分區後得到 [6, 3, 1, 2, 7, 9, 8]<br>
-                    7 固定到正確位置，左側都 ≤ 7，右側都 > 7
+                    <strong>建堆後：</strong> [9, 8, 7, 1, 3, 2, 6]<br>
+                    堆頂 9 為目前最大值
                 </div>
 
                 <div class="example-step">
-                    <strong>第二步：</strong> 遞迴處理左半 [6, 3, 1, 2] 與右半 [9, 8]<br>
-                    左半 pivot = 2，右半 pivot = 8
+                    <strong>第一輪提取：</strong> 交換堆頂與尾端，得到 [..., 9]<br>
+                    對剩餘區間重新 heapify
                 </div>
 
                 <div class="example-step">
-                    <strong>第三步：</strong> 左半變為 [1, 2, 6, 3]，右半變為 [8, 9]<br>
-                    持續遞迴直到每段長度 ≤ 1
+                    <strong>重複提取：</strong> 每一輪都把當前最大值放到正確尾端位置
                 </div>
 
                 <div class="example-step">
@@ -395,7 +394,7 @@ end algorithm</code></pre>
             <section>
                 <h2>模型動畫</h2>
 
-                <p>下面是快速排序的可視化演示，你可以觀看演算法如何透過 pivot 分區逐步完成排序：</p>
+                <p>下面是堆排序的可視化演示，你可以觀察「建堆」與「提取最大值」兩個核心階段：</p>
 
                 <div class="visualization">
                     <h3>排序可視化</h3>
@@ -432,30 +431,32 @@ end algorithm</code></pre>
                 <div class="code-block">
                     <pre><code>#include &lt;stdio.h&gt;
 
-int partition(int arr[], int low, int high) {
-    int pivot = arr[high];
-    int i = low - 1;
+void heapify(int arr[], int n, int i) {
+    int largest = i;
+    int left = 2 * i + 1;
+    int right = 2 * i + 2;
 
-    for (int j = low; j &lt; high; j++) {
-        if (arr[j] &lt;= pivot) {
-            i++;
-            int temp = arr[i];
-            arr[i] = arr[j];
-            arr[j] = temp;
-        }
+    if (left &lt; n &amp;&amp; arr[left] &gt; arr[largest]) largest = left;
+    if (right &lt; n &amp;&amp; arr[right] &gt; arr[largest]) largest = right;
+
+    if (largest != i) {
+        int temp = arr[i];
+        arr[i] = arr[largest];
+        arr[largest] = temp;
+        heapify(arr, n, largest);
     }
-
-    int temp = arr[i + 1];
-    arr[i + 1] = arr[high];
-    arr[high] = temp;
-    return i + 1;
 }
 
-void quickSort(int arr[], int low, int high) {
-    if (low &lt; high) {
-        int pi = partition(arr, low, high);
-        quickSort(arr, low, pi - 1);
-        quickSort(arr, pi + 1, high);
+void heapSort(int arr[], int n) {
+    for (int i = n / 2 - 1; i &gt;= 0; i--) {
+        heapify(arr, n, i);
+    }
+
+    for (int i = n - 1; i &gt; 0; i--) {
+        int temp = arr[0];
+        arr[0] = arr[i];
+        arr[i] = temp;
+        heapify(arr, i, 0);
     }
 }</code></pre>
                 </div>
@@ -465,55 +466,63 @@ void quickSort(int arr[], int low, int high) {
                     <pre><code>#include &lt;iostream&gt;
 using namespace std;
 
-int partition(int arr[], int low, int high) {
-    int pivot = arr[high];
-    int i = low - 1;
+void heapify(int arr[], int n, int i) {
+    int largest = i;
+    int left = 2 * i + 1;
+    int right = 2 * i + 2;
 
-    for (int j = low; j &lt; high; j++) {
-        if (arr[j] &lt;= pivot) {
-            i++;
-            swap(arr[i], arr[j]);
-        }
+    if (left &lt; n &amp;&amp; arr[left] &gt; arr[largest]) largest = left;
+    if (right &lt; n &amp;&amp; arr[right] &gt; arr[largest]) largest = right;
+
+    if (largest != i) {
+        swap(arr[i], arr[largest]);
+        heapify(arr, n, largest);
     }
-
-    swap(arr[i + 1], arr[high]);
-    return i + 1;
 }
 
-void quickSort(int arr[], int low, int high) {
-    if (low &lt; high) {
-        int pi = partition(arr, low, high);
-        quickSort(arr, low, pi - 1);
-        quickSort(arr, pi + 1, high);
+void heapSort(int arr[], int n) {
+    for (int i = n / 2 - 1; i &gt;= 0; i--) {
+        heapify(arr, n, i);
+    }
+
+    for (int i = n - 1; i &gt; 0; i--) {
+        swap(arr[0], arr[i]);
+        heapify(arr, i, 0);
     }
 }</code></pre>
                 </div>
 
                 <h3>Python 語言實現</h3>
                 <div class="code-block">
-                    <pre><code>def quick_sort(arr):
-    def partition(a, low, high):
-        pivot = a[high]
-        i = low - 1
-        for j in range(low, high):
-            if a[j] &lt;= pivot:
-                i += 1
-                a[i], a[j] = a[j], a[i]
-        a[i + 1], a[high] = a[high], a[i + 1]
-        return i + 1
+                    <pre><code>def heap_sort(arr):
+    def heapify(a, n, i):
+        largest = i
+        left = 2 * i + 1
+        right = 2 * i + 2
 
-    def sort(a, low, high):
-        if low &lt; high:
-            p = partition(a, low, high)
-            sort(a, low, p - 1)
-            sort(a, p + 1, high)
+        if left &lt; n and a[left] &gt; a[largest]:
+            largest = left
+        if right &lt; n and a[right] &gt; a[largest]:
+            largest = right
 
-    sort(arr, 0, len(arr) - 1)
+        if largest != i:
+            a[i], a[largest] = a[largest], a[i]
+            heapify(a, n, largest)
+
+    n = len(arr)
+
+    for i in range(n // 2 - 1, -1, -1):
+        heapify(arr, n, i)
+
+    for end in range(n - 1, 0, -1):
+        arr[0], arr[end] = arr[end], arr[0]
+        heapify(arr, end, 0)
+
     return arr
 
 # 使用範例
 arr = [6, 3, 9, 1, 8, 2, 7]
-print("排序後：", quick_sort(arr))</code></pre>
+print("排序後：", heap_sort(arr))</code></pre>
                 </div>
             </section>
 
@@ -532,44 +541,44 @@ print("排序後：", quick_sort(arr))</code></pre>
                         <tr>
                             <td><strong>最佳情況</strong></td>
                             <td>O(n log n)</td>
-                            <td>每次分區都接近平衡切分</td>
+                            <td>即使資料接近有序，仍需維持堆操作</td>
                         </tr>
                         <tr>
                             <td><strong>平均情況</strong></td>
                             <td>O(n log n)</td>
-                            <td>隨機資料下通常表現優異</td>
+                            <td>建堆 O(n) + n 次提取與堆化</td>
                         </tr>
                         <tr>
                             <td><strong>最壞情況</strong></td>
-                            <td>O(n²)</td>
-                            <td>每次 pivot 都落在一端，導致極度不平衡</td>
+                            <td>O(n log n)</td>
+                            <td>堆排序可提供穩定的上界表現</td>
                         </tr>
                         <tr>
                             <td><strong>空間複雜度</strong></td>
-                            <td>O(log n)</td>
-                            <td>遞迴呼叫堆疊深度（平均）</td>
+                            <td>O(1)</td>
+                            <td>原地排序，不需額外陣列</td>
                         </tr>
                         <tr>
                             <td><strong>穩定性</strong></td>
                             <td>不穩定</td>
-                            <td>相等元素的相對順序可能改變</td>
+                            <td>相等元素相對順序可能改變</td>
                         </tr>
                     </tbody>
                 </table>
 
                 <h3>時間複雜度分析</h3>
                 <ul>
-                    <li><strong>分區成本</strong>：每層約 O(n) 的比較與交換</li>
-                    <li><strong>遞迴深度</strong>：平均為 O(log n)，最壞為 O(n)</li>
-                    <li><strong>總成本</strong>：平均 O(n log n)，最壞 O(n²)</li>
+                    <li><strong>建堆成本</strong>：自底向上建最大堆，總成本為 O(n)</li>
+                    <li><strong>提取成本</strong>：每輪提取後 heapify 約 O(log n)</li>
+                    <li><strong>總成本</strong>：n 輪提取，整體為 O(n log n)</li>
                 </ul>
 
                 <h3>性能特點</h3>
                 <ul>
-                    <li>實務上平均效能通常優於許多同級演算法</li>
-                    <li>屬於原地排序，額外記憶體需求較低</li>
-                    <li>可透過隨機 pivot 或三數取中降低最壞情況風險</li>
-                    <li>常作為高效混合排序的核心元件</li>
+                    <li>最壞情況仍維持 O(n log n)，效能上界明確</li>
+                    <li>原地排序，記憶體需求低</li>
+                    <li>不需要遞迴分割整個陣列區間</li>
+                    <li>對快取區域性通常不如快速排序友善</li>
                 </ul>
             </section>
 
@@ -580,21 +589,21 @@ print("排序後：", quick_sort(arr))</code></pre>
                     <div class="pros">
                         <h4>✓ 優點</h4>
                         <ul>
-                            <li>平均時間複雜度佳，適合中大型資料集</li>
-                            <li>就地排序，空間使用率高</li>
-                            <li>分治架構清楚，容易延伸優化</li>
-                            <li>實務應用廣泛，工程成熟度高</li>
-                            <li>快取友善，常有不錯的常數表現</li>
+                            <li>最佳、平均、最壞時間皆為 O(n log n)</li>
+                            <li>原地排序，空間複雜度 O(1)</li>
+                            <li>不依賴資料分布，效能可預測</li>
+                            <li>適合需保證最壞時間上限的場景</li>
+                            <li>可作為 introsort 的備援策略</li>
                         </ul>
                     </div>
                     <div class="cons">
                         <h4>✗ 缺點</h4>
                         <ul>
-                            <li>最壞情況時間複雜度為 O(n²)</li>
-                            <li>不穩定排序，不保證等值元素相對順序</li>
-                            <li>遞迴實作在極端情況可能造成深層呼叫</li>
-                            <li>pivot 策略不佳時會顯著退化</li>
-                            <li>在非常小的陣列上不一定比插入排序快</li>
+                            <li>不穩定排序，無法保證等值元素順序</li>
+                            <li>常數因子在部分情境較高</li>
+                            <li>資料存取跳躍，快取友善度較差</li>
+                            <li>對小型資料不一定比插入排序快</li>
+                            <li>可讀性通常低於簡單排序法</li>
                         </ul>
                     </div>
                 </div>
@@ -605,26 +614,26 @@ print("排序後：", quick_sort(arr))</code></pre>
 
                 <h3>適用場景</h3>
                 <ul>
-                    <li><strong>一般用途排序</strong>：對隨機資料有穩定平均效能</li>
-                    <li><strong>大規模資料</strong>：在記憶體受限環境常是優先選擇</li>
-                    <li><strong>工程實作</strong>：可作為混合排序（如 introsort）核心</li>
-                    <li><strong>系統工具</strong>：許多底層函式庫採納其變體</li>
+                    <li><strong>最壞情況有硬性要求</strong>：需保證上界時可優先考慮</li>
+                    <li><strong>記憶體受限環境</strong>：原地排序優勢明顯</li>
+                    <li><strong>混合排序框架</strong>：作為退化時的穩健後備策略</li>
+                    <li><strong>系統層任務</strong>：適合穩定可預測時間需求</li>
                 </ul>
 
                 <h3>不適用場景</h3>
                 <ul>
-                    <li><strong>穩定排序需求</strong>：需保序時可改用歸併排序</li>
-                    <li><strong>已近乎有序且 pivot 固定</strong>：可能觸發最壞情況</li>
-                    <li><strong>遞迴深度受限環境</strong>：需特別避免深遞迴風險</li>
+                    <li><strong>需要穩定排序</strong>：可改用歸併排序或 Timsort</li>
+                    <li><strong>極度追求平均常數效能</strong>：快速排序常更具優勢</li>
+                    <li><strong>大量重複鍵且需保序</strong>：堆排序不適合</li>
                 </ul>
 
                 <h3>實際應用示例</h3>
                 <div class="code-block">
-                    <pre><code>// 工程上常用隨機化 quicksort + 小區間改用 insertion sort
-// 以同時兼顧平均性能與實務穩定性
+                    <pre><code>// introsort 概念：先用 quicksort
+// 當遞迴深度過深時改用 heapsort，避免 O(n^2) 退化
 
-if (subArraySize <= 16) {
-    insertionSort(subArray);
+if (depthLimitReached) {
+    heapSort(subArray);
 } else {
     quickSort(subArray, low, high);
 }</code></pre>
@@ -647,6 +656,14 @@ if (subArraySize <= 16) {
                     </thead>
                     <tbody>
                         <tr>
+                            <td><strong>堆排序</strong></td>
+                            <td>O(n log n)</td>
+                            <td>O(n log n)</td>
+                            <td>O(n log n)</td>
+                            <td>O(1)</td>
+                            <td>不穩定</td>
+                        </tr>
+                        <tr>
                             <td><strong>快速排序</strong></td>
                             <td>O(n log n)</td>
                             <td>O(n log n)</td>
@@ -661,14 +678,6 @@ if (subArraySize <= 16) {
                             <td>O(n log n)</td>
                             <td>O(n)</td>
                             <td>穩定</td>
-                        </tr>
-                        <tr>
-                            <td><strong>堆排序</strong></td>
-                            <td>O(n log n)</td>
-                            <td>O(n log n)</td>
-                            <td>O(n log n)</td>
-                            <td>O(1)</td>
-                            <td>不穩定</td>
                         </tr>
                         <tr>
                             <td><strong>插入排序</strong></td>
@@ -693,22 +702,22 @@ if (subArraySize <= 16) {
             <section>
                 <h2>總結</h2>
 
-                <p>快速排序在平均情況下具備出色效率與良好的空間表現，是實務中非常重要的排序演算法。透過合理的 pivot 策略與混合式優化，能顯著降低退化風險，成為兼顧效能與工程可行性的排序方案。</p>
+                <p>堆排序是一個強調「最壞情況保證」與「低空間成本」的經典排序法。當需求重視效能上界與記憶體控制時，堆排序是實務上非常可靠的選擇。若再搭配混合排序策略，能同時兼顧平均效能與穩定上界。</p>
 
                 <ul>
-                    <li><span class="highlight-yellow">平均效率高</span>：常見資料分布下有穩定優勢</li>
-                    <li><span class="highlight-yellow">原地排序</span>：額外記憶體消耗低</li>
-                    <li><span class="highlight-yellow">可擴充性佳</span>：可搭配隨機化與混合策略</li>
-                    <li><span class="highlight-yellow">注意最壞情況</span>：需避免不良 pivot 造成退化</li>
-                    <li><span class="highlight-yellow">工程價值高</span>：廣泛應用於標準庫與系統排序</li>
+                    <li><span class="highlight-yellow">上界穩定</span>：最壞情況仍為 O(n log n)</li>
+                    <li><span class="highlight-yellow">空間節省</span>：原地排序，額外記憶體極低</li>
+                    <li><span class="highlight-yellow">工程可靠</span>：常作為高風險退化場景的保險策略</li>
+                    <li><span class="highlight-yellow">不穩定排序</span>：若需保序需改用其他算法</li>
+                    <li><span class="highlight-yellow">適合混合應用</span>：可與 quicksort 結合提升整體韌性</li>
                 </ul>
             </section>
         </main>
 
         <footer>
-            <p>&copy; 2026 排序算法學習中心 | 快速排序法完整教學</p>
-            <p>本文檔提供了快速排序的原理、實現與應用說明</p>
-            <a href="index.html" style="display:inline-block;margin-top:15px;padding:10px 24px;background:linear-gradient(135deg,#355c7d,#6c5b7b);color:white;border-radius:30px;text-decoration:none;font-weight:bold;transition:background 0.3s;">回到首頁</a>
+            <p>&copy; 2026 排序算法學習中心 | 堆排序法完整教學</p>
+            <p>本文檔提供了堆排序的原理、實現與應用說明</p>
+            <a href="index.html" style="display:inline-block;margin-top:15px;padding:10px 24px;background:linear-gradient(135deg,#1f4e5f,#227c9d);color:white;border-radius:30px;text-decoration:none;font-weight:bold;transition:background 0.3s;">回到首頁</a>
         </footer>
     </div>
 
@@ -783,53 +792,97 @@ if (subArraySize <= 16) {
             bars[index].textContent = array[index];
         }
 
-        async function partition(low, high) {
-            const bars = document.querySelectorAll('.bar');
-            const pivot = array[high];
-            let i = low - 1;
-
-            bars[high].classList.add('pivot');
-            document.getElementById('stepInfo').textContent = `目前分區範圍 [${low}, ${high}]，pivot = ${pivot}`;
-            await sleep(getDelay());
-
-            for (let j = low; j < high; j++) {
-                bars[j].classList.add('highlight');
-                document.getElementById('stepInfo').textContent = `比較 ${array[j]} 與 pivot ${pivot}`;
-                await sleep(getDelay() / 2);
-
-                if (array[j] <= pivot) {
-                    i++;
-                    [array[i], array[j]] = [array[j], array[i]];
-                    renderValueAt(i);
-                    renderValueAt(j);
-                    document.getElementById('stepInfo').textContent = `因 ${array[i]} <= ${pivot}，交換索引 ${i} 與 ${j}`;
-                    await sleep(getDelay() / 2);
-                }
-                bars[j].classList.remove('highlight');
-            }
-
-            [array[i + 1], array[high]] = [array[high], array[i + 1]];
-            renderValueAt(i + 1);
-            renderValueAt(high);
-            bars[high].classList.remove('pivot');
-            bars[i + 1].classList.add('sorted');
-
-            document.getElementById('stepInfo').textContent = `pivot ${pivot} 放到正確位置 ${i + 1}`;
-            await sleep(getDelay());
-            return i + 1;
+        function clearMarks() {
+            document.querySelectorAll('.bar').forEach((bar) => {
+                bar.classList.remove('highlight');
+                bar.classList.remove('root');
+            });
         }
 
-        async function quickSortVisual(low, high) {
-            if (low > high) return;
-            if (low === high) {
-                const bars = document.querySelectorAll('.bar');
-                bars[low].classList.add('sorted');
-                return;
+        async function heapifyVisual(n, i) {
+            let largest = i;
+            const left = 2 * i + 1;
+            const right = 2 * i + 2;
+            const bars = document.querySelectorAll('.bar');
+
+            clearMarks();
+            bars[i].classList.add('root');
+            document.getElementById('stepInfo').textContent = `檢查節點索引 ${i}，堆範圍 0~${n - 1}`;
+            await sleep(getDelay() / 2);
+
+            if (left < n) {
+                bars[left].classList.add('highlight');
+                document.getElementById('stepInfo').textContent = `比較根 ${array[largest]} 與左子 ${array[left]}`;
+                await sleep(getDelay() / 2);
+                if (array[left] > array[largest]) {
+                    largest = left;
+                }
+                bars[left].classList.remove('highlight');
             }
 
-            const p = await partition(low, high);
-            await quickSortVisual(low, p - 1);
-            await quickSortVisual(p + 1, high);
+            if (right < n) {
+                bars[right].classList.add('highlight');
+                document.getElementById('stepInfo').textContent = `比較目前最大值 ${array[largest]} 與右子 ${array[right]}`;
+                await sleep(getDelay() / 2);
+                if (array[right] > array[largest]) {
+                    largest = right;
+                }
+                bars[right].classList.remove('highlight');
+            }
+
+            if (largest !== i) {
+                [array[i], array[largest]] = [array[largest], array[i]];
+                renderValueAt(i);
+                renderValueAt(largest);
+                bars[i].classList.add('highlight');
+                bars[largest].classList.add('highlight');
+                document.getElementById('stepInfo').textContent = `交換索引 ${i} 與 ${largest}，恢復最大堆`;
+                await sleep(getDelay());
+                bars[i].classList.remove('highlight');
+                bars[largest].classList.remove('highlight');
+                await heapifyVisual(n, largest);
+            }
+
+            bars[i].classList.remove('root');
+        }
+
+        async function heapSortVisual() {
+            const n = array.length;
+            const bars = document.querySelectorAll('.bar');
+
+            document.getElementById('stepInfo').textContent = '第一階段：建立最大堆';
+            await sleep(getDelay());
+
+            for (let i = Math.floor(n / 2) - 1; i >= 0; i--) {
+                await heapifyVisual(n, i);
+            }
+
+            document.getElementById('stepInfo').textContent = '第二階段：依序提取最大值到尾端';
+            await sleep(getDelay());
+
+            for (let end = n - 1; end > 0; end--) {
+                clearMarks();
+                bars[0].classList.add('root');
+                bars[end].classList.add('highlight');
+                document.getElementById('stepInfo').textContent = `交換堆頂 ${array[0]} 與尾端 ${array[end]}`;
+                await sleep(getDelay() / 2);
+
+                [array[0], array[end]] = [array[end], array[0]];
+                renderValueAt(0);
+                renderValueAt(end);
+
+                bars[end].classList.remove('highlight');
+                bars[end].classList.add('sorted');
+                bars[0].classList.remove('root');
+
+                document.getElementById('stepInfo').textContent = `索引 ${end} 已定位，對 0~${end - 1} 重新 heapify`;
+                await sleep(getDelay() / 2);
+
+                await heapifyVisual(end, 0);
+            }
+
+            bars[0].classList.add('sorted');
+            clearMarks();
         }
 
         async function startAnimation() {
@@ -853,13 +906,13 @@ if (subArraySize <= 16) {
             isAnimating = true;
             setControlsDisabled(true);
             initVisualization();
-            document.getElementById('stepInfo').textContent = '開始快速排序...';
+            document.getElementById('stepInfo').textContent = '開始堆排序...';
 
-            await quickSortVisual(0, array.length - 1);
+            await heapSortVisual();
 
             document.querySelectorAll('.bar').forEach((bar) => {
                 bar.classList.remove('highlight');
-                bar.classList.remove('pivot');
+                bar.classList.remove('root');
                 bar.classList.add('sorted');
             });
 
@@ -873,7 +926,7 @@ if (subArraySize <= 16) {
             updateSpeedLabel();
             document.getElementById('speed').addEventListener('input', updateSpeedLabel);
             document.getElementById('arrayInput').value = array.join(', ');
-            console.log('快速排序法文檔已加載');
+            console.log('堆排序法文檔已加載');
         });
     </script>
 </body>

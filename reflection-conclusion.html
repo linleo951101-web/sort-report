@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>心得與結論 | 排序演算法實驗室</title>
+    <style>
+        :root {
+            --bg: #f7f6f2;
+            --panel: #fffdf8;
+            --ink: #2a2f35;
+            --muted: #5f6772;
+            --accent: #ff7f50;
+            --accent-2: #f6b73c;
+            --line: #ece8de;
+            --shadow: 0 14px 30px rgba(54, 45, 36, 0.12);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+            color: var(--ink);
+            line-height: 1.75;
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at 0% 0%, rgba(255, 127, 80, 0.18), transparent 35%),
+                radial-gradient(circle at 100% 20%, rgba(246, 183, 60, 0.2), transparent 32%),
+                linear-gradient(180deg, #fffaf0 0%, var(--bg) 100%);
+        }
+
+        .container {
+            width: min(1020px, 92vw);
+            margin: 0 auto;
+            padding: 36px 0 52px;
+        }
+
+        .top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .back {
+            text-decoration: none;
+            color: #10243f;
+            font-weight: 700;
+            background: #ffffff;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            padding: 9px 15px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .back:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 18px rgba(16, 36, 63, 0.12);
+        }
+
+        .title {
+            font-size: clamp(1.7rem, 3.2vw, 2.5rem);
+            line-height: 1.35;
+            letter-spacing: 0.01em;
+        }
+
+        .subtitle {
+            margin-top: 6px;
+            color: var(--muted);
+            font-size: 1.02rem;
+        }
+
+        .hero {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 18px;
+            box-shadow: var(--shadow);
+            animation: rise 0.55s ease;
+        }
+
+        .hero p + p {
+            margin-top: 12px;
+        }
+
+        .quote {
+            margin-top: 16px;
+            border-left: 4px solid var(--accent);
+            padding: 8px 0 8px 14px;
+            color: #424a52;
+            background: linear-gradient(90deg, rgba(255, 127, 80, 0.1), transparent 70%);
+            border-radius: 0 10px 10px 0;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(240px, 1fr));
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .card {
+            background: #ffffff;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 18px;
+            box-shadow: 0 10px 20px rgba(47, 41, 35, 0.08);
+        }
+
+        .card h2 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            color: #1f2d3d;
+        }
+
+        .card p {
+            color: #4e5661;
+            font-size: 0.98rem;
+        }
+
+        .timeline {
+            background: #ffffff;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 16px;
+        }
+
+        .timeline h2 {
+            font-size: 1.14rem;
+            margin-bottom: 10px;
+        }
+
+        .timeline ul {
+            list-style: none;
+            display: grid;
+            gap: 10px;
+        }
+
+        .timeline li {
+            position: relative;
+            padding-left: 20px;
+            color: #495260;
+        }
+
+        .timeline li::before {
+            content: "";
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            position: absolute;
+            left: 0;
+            top: 10px;
+        }
+
+        .actions {
+            margin-top: 18px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .btn {
+            text-decoration: none;
+            border-radius: 999px;
+            padding: 10px 18px;
+            font-weight: 700;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .btn-main {
+            color: #fff;
+            background: linear-gradient(135deg, var(--accent), #ff5e52);
+            box-shadow: 0 10px 18px rgba(255, 94, 82, 0.22);
+        }
+
+        .btn-alt {
+            color: #1f2d3d;
+            background: #fff;
+            border: 1px solid var(--line);
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .footer-note {
+            color: #6a737f;
+            text-align: center;
+            font-size: 0.9rem;
+            margin-top: 18px;
+        }
+
+        @keyframes rise {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 760px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero,
+            .card,
+            .timeline {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <div class="top">
+            <a class="back" href="index.html">返回首頁</a>
+            <span style="color:#5f6772; font-size:0.92rem;">更新日期：2026/04/09</span>
+        </div>
+
+        <header class="hero">
+            <h1 class="title">排序演算法學習心得與結論</h1>
+            <p class="subtitle">從「會背流程」到「能選對方法」的轉變</p>
+            <p>這次整理排序主題後，最有感的收穫是：理解演算法不該只停在步驟，而是要連同資料特性、時間複雜度、穩定性與實作成本一起思考。當資料規模、資料分布、記憶體條件不同，最佳解法也會不同。</p>
+            <p>透過視覺化與多種排序對照，我更能辨識「比較次數」和「資料搬移次數」對效能的實際影響，也更容易知道某個演算法為什麼在特定情境下更合適。</p>
+            <div class="quote">結論不是「哪個排序最好」，而是「在當下情境，哪個排序最適合」。</div>
+        </header>
+
+        <section class="grid">
+            <article class="card">
+                <h2>核心理解</h2>
+                <p>基礎排序法雖然不一定最快，但非常適合建立演算法直覺；進階排序法則在大資料量下展現穩定且可擴展的優勢。</p>
+            </article>
+            <article class="card">
+                <h2>實作反思</h2>
+                <p>實作時，邊界條件與資料型別處理常比主流程更容易出錯。先寫可讀性高的版本，再做優化，通常更有效率。</p>
+            </article>
+            <article class="card">
+                <h2>效能觀點</h2>
+                <p>平均時間複雜度是參考值，但最差情況與空間成本同樣重要。實務上需同時看時間、記憶體與穩定性。</p>
+            </article>
+            <article class="card">
+                <h2>後續方向</h2>
+                <p>下一步可以延伸到外部排序、平行排序與混合策略，並結合實際資料集做壓力測試驗證選型。</p>
+            </article>
+        </section>
+
+        <section class="timeline">
+            <h2>最終結論摘要</h2>
+            <ul>
+                <li>小規模或近乎有序資料：插入排序在實務上常有不錯表現。</li>
+                <li>一般情境追求平均效能：快速排序仍是常見首選。</li>
+                <li>需要穩定性與可預測效能：合併排序更可靠。</li>
+                <li>學習路徑上：先掌握比較模型，再進入資料結構輔助優化。</li>
+            </ul>
+            <div class="actions">
+                <a class="btn btn-main" href="visual-demo.html">前往視覺化演示</a>
+                <a class="btn btn-alt" href="performance-analysis.html">查看性能分析</a>
+            </div>
+        </section>
+
+        <p class="footer-note">本頁為學習總結頁，可依課程進度持續補充案例與實驗紀錄。</p>
+    </main>
+</body>
+</html>

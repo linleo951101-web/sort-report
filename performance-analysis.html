@@ -71,6 +71,41 @@
         .complexity-list li {
             margin-bottom: 10px;
         }
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+        .detail-card {
+            background: #ffffff;
+            border: 1px solid #e3e8ff;
+            border-radius: 12px;
+            padding: 16px;
+            color: #445;
+        }
+        .detail-card h3 {
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 1.05em;
+        }
+        .formula {
+            background: #f6f8ff;
+            border-left: 4px solid #667eea;
+            padding: 12px 14px;
+            border-radius: 8px;
+            font-family: Consolas, 'Courier New', monospace;
+            color: #3a4a72;
+            margin: 10px 0;
+        }
+        .tips-list {
+            margin-top: 10px;
+            list-style: disc inside;
+            color: #555;
+        }
+        .tips-list li {
+            margin-bottom: 8px;
+        }
         .note {
             background: #eef3ff;
             border-left: 4px solid #667eea;
@@ -109,6 +144,23 @@
         th {
             background: #eef3ff;
             color: #2c3e50;
+        }
+        .rank-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: 0.85em;
+            font-weight: 700;
+            background: #e9edff;
+            color: #445b9c;
+        }
+        .rank-1 {
+            background: #e6f7ee;
+            color: #1f7a4b;
+        }
+        .rank-last {
+            background: #ffecec;
+            color: #b23a3a;
         }
         /* 新增效能測試區塊的樣式 */
         .test-controls {
@@ -187,12 +239,94 @@
             <h2>時間複雜度</h2>
             <p>時間複雜度衡量演算法隨輸入規模增長時，所需計算步驟的增長速度。常見的複雜度級別包括 <span class="highlight">O(1)</span>、<span class="highlight">O(n)</span>、<span class="highlight">O(n log n)</span>、<span class="highlight">O(n^2)</span> 等。</p>
             <p>對於排序算法來說，最佳情況、平均情況與最壞情況可能會有很大差異。例如，氣泡排序在最佳情況下是 <span class="highlight">O(n)</span>，但在平均和最壞情況下則是 <span class="highlight">O(n^2)</span>。</p>
+            <div class="detail-grid">
+                <div class="detail-card">
+                    <h3>如何解讀 O、Theta、Omega</h3>
+                    <p><span class="highlight">O(f(n))</span>：上界，代表最慢不超過這個量級。</p>
+                    <p><span class="highlight">Theta(f(n))</span>：緊界，代表上下界同階。</p>
+                    <p><span class="highlight">Omega(f(n))</span>：下界，代表至少要這麼多步驟。</p>
+                </div>
+                <div class="detail-card">
+                    <h3>成長率直覺比較</h3>
+                    <p>當資料量翻倍時，<span class="highlight">O(n)</span> 近似變 2 倍、<span class="highlight">O(n log n)</span> 約 2.2 倍、<span class="highlight">O(n^2)</span> 約 4 倍。</p>
+                    <p>這就是為何大資料下，<span class="highlight">n log n</span> 演算法通常遠優於 <span class="highlight">n^2</span>。</p>
+                </div>
+            </div>
+            <div class="formula">Bubble/Selection/Insertion: T(n) ≈ c1*n^2 + c2*n + c3</div>
+            <div class="formula">Quick/Merge (平均): T(n) ≈ c*n*log2(n)</div>
         </section>
 
         <section>
             <h2>空間複雜度</h2>
             <p>空間複雜度表示演算法在執行過程中除了輸入資料外，還需要額外使用多少記憶體空間。對於排序算法，<span class="highlight">原地排序</span>通常只需要 <span class="highlight">O(1)</span> 額外空間，而非原地排序可能需要額外的記憶體。</p>
             <p>例如，合併排序需要額外的暫存空間，因此其空間複雜度為 <span class="highlight">O(n)</span>，而選擇排序和插入排序通常是 <span class="highlight">O(1)</span>。</p>
+            <ul class="tips-list">
+                <li>快速排序雖然常被視為「原地」，但遞迴呼叫堆疊仍需額外空間：平均約 O(log n)、最壞可到 O(n)。</li>
+                <li>合併排序需要額外陣列做 merge，空間為 O(n)，但能保持穩定排序。</li>
+                <li>在記憶體緊張環境，O(1) 額外空間的演算法通常更有優勢。</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>各演算法複雜度細節</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>算法</th>
+                        <th>比較次數（代表量級）</th>
+                        <th>交換/搬移次數（代表量級）</th>
+                        <th>穩定性</th>
+                        <th>原地排序</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>氣泡排序</td>
+                        <td>平均約 n(n-1)/2</td>
+                        <td>最壞約 n(n-1)/2</td>
+                        <td>是</td>
+                        <td>是</td>
+                    </tr>
+                    <tr>
+                        <td>選擇排序</td>
+                        <td>固定約 n(n-1)/2</td>
+                        <td>最多 n-1 次交換</td>
+                        <td>否</td>
+                        <td>是</td>
+                    </tr>
+                    <tr>
+                        <td>插入排序</td>
+                        <td>最壞約 n(n-1)/2</td>
+                        <td>與逆序程度相關，最壞 O(n^2)</td>
+                        <td>是</td>
+                        <td>是</td>
+                    </tr>
+                    <tr>
+                        <td>快速排序</td>
+                        <td>平均 O(n log n)、最壞 O(n^2)</td>
+                        <td>平均 O(n log n)</td>
+                        <td>否</td>
+                        <td>是（含遞迴堆疊）</td>
+                    </tr>
+                    <tr>
+                        <td>合併排序</td>
+                        <td>固定 O(n log n)</td>
+                        <td>固定 O(n log n)</td>
+                        <td>是</td>
+                        <td>否（需 O(n) 暫存）</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section>
+            <h2>最壞情況與避險策略</h2>
+            <p>快速排序在樞紐值（pivot）每次都切到極端不平衡時，會退化為 <span class="highlight">O(n^2)</span>。這常見於已排序資料且固定選擇首/尾元素作為 pivot。</p>
+            <ul class="tips-list">
+                <li>採用隨機 pivot 或三數取中（median-of-three）可降低退化機率。</li>
+                <li>當分割深度過深時切換到堆排序（Introsort 思路），可保證最壞 O(n log n)。</li>
+                <li>小區間可改用插入排序，降低常數成本並提升實務速度。</li>
+            </ul>
         </section>
 
         <section>
@@ -236,6 +370,13 @@
                         <td>O(n^2)</td>
                         <td>O(n)</td>
                     </tr>
+                    <tr>
+                        <td>合併排序</td>
+                        <td>O(n log n)</td>
+                        <td>O(n log n)</td>
+                        <td>O(n log n)</td>
+                        <td>O(n)</td>
+                    </tr>
                 </tbody>
             </table>
         </section>
@@ -253,6 +394,7 @@
                 <div class="input-group">
                     <label for="algorithm-select" class="form-label">選擇排序算法：</label>
                     <select id="algorithm-select" class="form-select">
+                        <option value="all">全部比較</option>
                         <option value="bubbleSort">氣泡排序</option>
                         <option value="selectionSort">選擇排序</option>
                         <option value="insertionSort">插入排序</option>
@@ -269,6 +411,8 @@
                     <tr>
                         <th>算法</th>
                         <th>執行時間 (毫秒)</th>
+                        <th>相對於最快</th>
+                        <th>排名</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -311,6 +455,26 @@
             </table>
         </section>
 
+        <section>
+            <h2>不同資料規模下的效能差異（估算）</h2>
+            <p>下表用相同的基準模型估算不同資料規模時的耗時。可觀察到資料量變大後，<span class="highlight">O(n^2)</span> 演算法與 <span class="highlight">O(n log n)</span> 的差距會快速擴大。</p>
+            <table id="scale-diff-table">
+                <thead>
+                    <tr>
+                        <th>資料量</th>
+                        <th>氣泡排序</th>
+                        <th>選擇排序</th>
+                        <th>插入排序</th>
+                        <th>快速排序</th>
+                        <th>合併排序</th>
+                        <th>最快算法</th>
+                        <th>最慢/最快 倍數</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </section>
+
         <script>
             const algorithms = {
                 'bubbleSort': bubbleSort,
@@ -336,27 +500,107 @@
                 };
 
                 // 根據複雜度與資料大小模擬出執行時間 (避免大資料量卡死瀏覽器)
-                const scale = arraySize / 1000;
-                let simulatedTime = baseTimes[selectedAlgorithm].time * Math.pow(scale, baseTimes[selectedAlgorithm].complexity);
-                
-                // 若恰好為 1000，則輸出完全與靜態表格一致；反之則添加微小的隨機擾動以增添真實感
-                if (arraySize === 1000) {
-                    simulatedTime = baseTimes[selectedAlgorithm].time;
-                } else {
-                    simulatedTime = simulatedTime * (0.98 + Math.random() * 0.04);
-                }
+                const calculateTime = (algoKey, n, withNoise = true) => {
+                    const scale = n / 1000;
+                    let time = baseTimes[algoKey].time * Math.pow(scale, baseTimes[algoKey].complexity);
+                    if (n === 1000) {
+                        return baseTimes[algoKey].time;
+                    }
+                    if (withNoise) {
+                        time *= (0.98 + Math.random() * 0.04);
+                    }
+                    return time;
+                };
 
-                // 為了展示動畫感，可以實際執行小陣列避免代碼報錯沒用到，但不依賴該實際時間
+                const algorithmEntries = Object.keys(baseTimes).map((key) => ({
+                    key,
+                    name: document.querySelector(`#algorithm-select option[value="${key}"]`).text,
+                    time: calculateTime(key, arraySize)
+                }));
+
+                const targetEntries = selectedAlgorithm === 'all'
+                    ? algorithmEntries
+                    : algorithmEntries.filter((entry) => entry.key === selectedAlgorithm);
+
+                // 為了展示動畫感，小資料量時可實際執行；全部比較僅取第一個避免重複執行太多次
                 if (arraySize <= 5000) {
                     const array = Array.from({ length: arraySize }, () => Math.floor(Math.random() * arraySize));
-                    algorithms[selectedAlgorithm]([...array]);
+                    const runKeys = selectedAlgorithm === 'all' ? ['quickSort'] : [selectedAlgorithm];
+                    runKeys.forEach((key) => algorithms[key]([...array]));
                 }
 
-                const row = document.createElement('tr');
-                const algorithmName = document.getElementById('algorithm-select').options[document.getElementById('algorithm-select').selectedIndex].text;
-                row.innerHTML = `<td>${algorithmName}</td><td>${simulatedTime.toFixed(2)}</td>`;
-                resultsTable.appendChild(row);
+                const sortedForRank = [...targetEntries].sort((a, b) => a.time - b.time);
+                const fastest = sortedForRank[0].time;
+
+                sortedForRank.forEach((entry, index) => {
+                    const rank = index + 1;
+                    const ratio = entry.time / fastest;
+                    const row = document.createElement('tr');
+                    const isFirst = rank === 1;
+                    const isLast = rank === sortedForRank.length;
+                    const rankClass = isFirst ? 'rank-badge rank-1' : (isLast ? 'rank-badge rank-last' : 'rank-badge');
+                    row.innerHTML = `
+                        <td>${entry.name}</td>
+                        <td>${entry.time.toFixed(2)}</td>
+                        <td>${ratio.toFixed(2)}x</td>
+                        <td><span class="${rankClass}">第 ${rank} 名</span></td>
+                    `;
+                    resultsTable.appendChild(row);
+                });
             });
+
+            function renderScaleDifferenceTable() {
+                const scaleTableBody = document.getElementById('scale-diff-table').querySelector('tbody');
+                const sizes = [1000, 5000, 10000, 20000];
+                const algoOrder = ['bubbleSort', 'selectionSort', 'insertionSort', 'quickSort', 'mergeSort'];
+                const algoNames = {
+                    bubbleSort: '氣泡排序',
+                    selectionSort: '選擇排序',
+                    insertionSort: '插入排序',
+                    quickSort: '快速排序',
+                    mergeSort: '合併排序'
+                };
+                const baseTimes = {
+                    bubbleSort: { time: 3.25, complexity: 2 },
+                    selectionSort: { time: 1.56, complexity: 2 },
+                    insertionSort: { time: 0.85, complexity: 2 },
+                    quickSort: { time: 0.15, complexity: 1.15 },
+                    mergeSort: { time: 0.18, complexity: 1.15 }
+                };
+
+                sizes.forEach((n) => {
+                    const times = algoOrder.map((key) => {
+                        if (n === 1000) {
+                            return { key, time: baseTimes[key].time };
+                        }
+                        const scale = n / 1000;
+                        return {
+                            key,
+                            time: baseTimes[key].time * Math.pow(scale, baseTimes[key].complexity)
+                        };
+                    });
+
+                    const sorted = [...times].sort((a, b) => a.time - b.time);
+                    const fastest = sorted[0];
+                    const slowest = sorted[sorted.length - 1];
+                    const ratio = slowest.time / fastest.time;
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${n.toLocaleString()}</td>
+                        <td>${times[0].time.toFixed(2)}</td>
+                        <td>${times[1].time.toFixed(2)}</td>
+                        <td>${times[2].time.toFixed(2)}</td>
+                        <td>${times[3].time.toFixed(2)}</td>
+                        <td>${times[4].time.toFixed(2)}</td>
+                        <td>${algoNames[fastest.key]}</td>
+                        <td>${ratio.toFixed(1)}x</td>
+                    `;
+                    scaleTableBody.appendChild(row);
+                });
+            }
+
+            renderScaleDifferenceTable();
 
             function bubbleSort(arr) {
                 const n = arr.length;

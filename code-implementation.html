@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>代碼實作 - 五種排序耗時比較</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(180deg, #f9fafc 0%, #eef3ff 100%);
+            color: #2c3e50;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 36px 20px 56px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 28px;
+        }
+
+        .back-link {
+            text-decoration: none;
+            color: #4c67d6;
+            font-weight: 700;
+        }
+
+        .title {
+            margin-bottom: 8px;
+            font-size: 2.3rem;
+        }
+
+        .subtitle {
+            color: #516177;
+            max-width: 820px;
+        }
+
+        .panel {
+            margin-top: 24px;
+            background: #ffffff;
+            border-radius: 18px;
+            border: 1px solid #dce3ff;
+            box-shadow: 0 14px 35px rgba(88, 108, 201, 0.14);
+            padding: 24px;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 14px;
+            align-items: end;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .field label {
+            font-size: 0.95rem;
+            color: #45556b;
+            font-weight: 600;
+        }
+
+        .field input,
+        .field select {
+            border: 1px solid #c8d4ff;
+            border-radius: 10px;
+            background: #f7f9ff;
+            padding: 10px 12px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .field input:focus,
+        .field select:focus {
+            border-color: #4c67d6;
+            background: #fff;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 12px;
+            padding: 11px 16px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            color: #fff;
+            background: linear-gradient(135deg, #4c67d6 0%, #8a56c7 100%);
+            transition: transform 0.16s ease, box-shadow 0.16s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 18px rgba(76, 103, 214, 0.28);
+        }
+
+        .hint {
+            margin-top: 12px;
+            font-size: 0.93rem;
+            color: #5a6d87;
+        }
+
+        .output-grid {
+            margin-top: 22px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        .card {
+            background: #f7f9ff;
+            border: 1px solid #d8e1ff;
+            border-radius: 14px;
+            padding: 16px;
+        }
+
+        .card h2 {
+            font-size: 1.12rem;
+            margin-bottom: 8px;
+        }
+
+        .preview {
+            white-space: pre-wrap;
+            word-break: break-word;
+            color: #334155;
+            font-family: Consolas, 'Courier New', monospace;
+            font-size: 0.92rem;
+            background: #ffffff;
+            border: 1px dashed #c9d5ff;
+            border-radius: 10px;
+            padding: 10px;
+            min-height: 84px;
+        }
+
+        .table-wrap {
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border: 1px solid #dce4ff;
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        th,
+        td {
+            border-bottom: 1px solid #e7ecff;
+            text-align: left;
+            padding: 12px 14px;
+            font-size: 0.95rem;
+        }
+
+        th {
+            background: #eff3ff;
+            color: #2d3f79;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #fafbff;
+        }
+
+        .rank {
+            display: inline-block;
+            min-width: 46px;
+            text-align: center;
+            border-radius: 999px;
+            padding: 3px 8px;
+            font-size: 0.84rem;
+            font-weight: 700;
+            color: #355;
+            background: #e8edff;
+        }
+
+        .rank.top {
+            background: #e4f7ea;
+            color: #1f7a47;
+        }
+
+        .bars {
+            margin-top: 20px;
+            display: grid;
+            gap: 10px;
+        }
+
+        .bar-row {
+            display: grid;
+            grid-template-columns: 110px 1fr 84px;
+            gap: 10px;
+            align-items: center;
+            font-size: 0.92rem;
+        }
+
+        .bar-bg {
+            height: 12px;
+            border-radius: 999px;
+            background: #e7ecff;
+            overflow: hidden;
+        }
+
+        .bar {
+            height: 100%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, #4c67d6 0%, #8a56c7 100%);
+        }
+
+        .legend {
+            margin-top: 10px;
+            color: #60708a;
+            font-size: 0.88rem;
+        }
+
+        .status {
+            margin-top: 14px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: #edf2ff;
+            color: #35508d;
+            font-size: 0.93rem;
+            display: none;
+        }
+
+        @media (max-width: 860px) {
+            .output-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .bar-row {
+                grid-template-columns: 88px 1fr 74px;
+                font-size: 0.88rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="topbar">
+            <a href="index.html" class="back-link">回首頁</a>
+        </div>
+
+        <h1 class="title">代碼實作：五種排序法</h1>
+        <p class="subtitle">使用同一批 n 個數據，執行氣泡排序、選擇排序、插入排序、快速排序、合併排序，並比較平均耗時（毫秒）。</p>
+
+        <section class="panel">
+            <div class="controls">
+                <div class="field">
+                    <label for="sizeInput">資料筆數 n</label>
+                    <input id="sizeInput" type="number" min="10" max="8000" value="1200">
+                </div>
+                <div class="field">
+                    <label for="modeSelect">資料型態</label>
+                    <select id="modeSelect">
+                        <option value="random">隨機</option>
+                        <option value="nearly">近乎有序</option>
+                        <option value="reversed">完全反序</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="repeatInput">重複次數</label>
+                    <input id="repeatInput" type="number" min="1" max="8" value="3">
+                </div>
+                <button id="runBtn" class="btn">執行五種排序比較</button>
+            </div>
+            <p class="hint">提醒：$O(n^2)$ 演算法在 n 很大時會明顯變慢。建議先從 500~2000 測試。</p>
+            <div class="status" id="statusBox"></div>
+
+            <div class="output-grid">
+                <div class="card">
+                    <h2>測試資料預覽（前 30 筆）</h2>
+                    <div class="preview" id="dataPreview">尚未產生資料</div>
+                </div>
+                <div class="card">
+                    <h2>最快演算法摘要</h2>
+                    <div class="preview" id="summaryBox">按下「執行五種排序比較」後顯示</div>
+                </div>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>排名</th>
+                            <th>演算法</th>
+                            <th>平均耗時 (ms)</th>
+                            <th>時間複雜度</th>
+                            <th>排序驗證</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultBody">
+                        <tr>
+                            <td colspan="5">尚未執行測試</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="bars" id="barChart"></div>
+            <p class="legend">條狀圖以當次最慢演算法作為 100%。</p>
+        </section>
+    </div>
+
+    <script>
+        const algorithmDefs = [
+            { key: 'bubble', name: '氣泡排序', complexity: 'O(n^2)', sortFn: bubbleSort },
+            { key: 'selection', name: '選擇排序', complexity: 'O(n^2)', sortFn: selectionSort },
+            { key: 'insertion', name: '插入排序', complexity: 'O(n^2)', sortFn: insertionSort },
+            { key: 'quick', name: '快速排序', complexity: '平均 O(n log n)', sortFn: quickSort },
+            { key: 'merge', name: '合併排序', complexity: 'O(n log n)', sortFn: mergeSort }
+        ];
+
+        const sizeInput = document.getElementById('sizeInput');
+        const modeSelect = document.getElementById('modeSelect');
+        const repeatInput = document.getElementById('repeatInput');
+        const runBtn = document.getElementById('runBtn');
+        const statusBox = document.getElementById('statusBox');
+        const dataPreview = document.getElementById('dataPreview');
+        const summaryBox = document.getElementById('summaryBox');
+        const resultBody = document.getElementById('resultBody');
+        const barChart = document.getElementById('barChart');
+
+        runBtn.addEventListener('click', runBenchmark);
+
+        function runBenchmark() {
+            const n = Number(sizeInput.value);
+            const repeats = Number(repeatInput.value);
+            const mode = modeSelect.value;
+
+            if (!Number.isInteger(n) || n < 10 || n > 8000) {
+                showStatus('請輸入 10 到 8000 之間的整數 n。', true);
+                return;
+            }
+
+            if (!Number.isInteger(repeats) || repeats < 1 || repeats > 8) {
+                showStatus('重複次數請輸入 1 到 8 之間的整數。', true);
+                return;
+            }
+
+            if (n > 5000) {
+                const allow = window.confirm('n 大於 5000 時，O(n^2) 排序可能花較久時間，是否仍要繼續？');
+                if (!allow) {
+                    return;
+                }
+            }
+
+            showStatus('測試進行中，請稍候...');
+            runBtn.disabled = true;
+
+            setTimeout(() => {
+                const baseData = generateData(n, mode);
+                dataPreview.textContent = baseData.slice(0, 30).join(', ');
+
+                const results = algorithmDefs.map((algo) => {
+                    const elapsedList = [];
+                    let valid = true;
+
+                    for (let i = 0; i < repeats; i += 1) {
+                        const sample = baseData.slice();
+                        const start = performance.now();
+                        const sorted = algo.sortFn(sample);
+                        const end = performance.now();
+                        elapsedList.push(end - start);
+                        if (!isSorted(sorted)) {
+                            valid = false;
+                        }
+                    }
+
+                    const avgMs = elapsedList.reduce((sum, ms) => sum + ms, 0) / elapsedList.length;
+                    return {
+                        ...algo,
+                        avgMs,
+                        valid
+                    };
+                });
+
+                renderResults(results, n, repeats, mode);
+                runBtn.disabled = false;
+                showStatus('比較完成。');
+            }, 20);
+        }
+
+        function renderResults(results, n, repeats, mode) {
+            const sortedResults = results.slice().sort((a, b) => a.avgMs - b.avgMs);
+            const slowest = sortedResults[sortedResults.length - 1].avgMs;
+
+            resultBody.innerHTML = '';
+            barChart.innerHTML = '';
+
+            sortedResults.forEach((item, index) => {
+                const rank = index + 1;
+                const rankClass = rank === 1 ? 'rank top' : 'rank';
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><span class="${rankClass}">第 ${rank} 名</span></td>
+                    <td>${item.name}</td>
+                    <td>${item.avgMs.toFixed(3)}</td>
+                    <td>${item.complexity}</td>
+                    <td>${item.valid ? '通過' : '失敗'}</td>
+                `;
+                resultBody.appendChild(tr);
+
+                const barPercent = slowest === 0 ? 0 : (item.avgMs / slowest) * 100;
+                const row = document.createElement('div');
+                row.className = 'bar-row';
+                row.innerHTML = `
+                    <span>${item.name}</span>
+                    <div class="bar-bg"><div class="bar" style="width:${barPercent.toFixed(1)}%"></div></div>
+                    <span>${item.avgMs.toFixed(2)} ms</span>
+                `;
+                barChart.appendChild(row);
+            });
+
+            const fastest = sortedResults[0];
+            const ratio = fastest.avgMs === 0 ? 0 : (slowest / fastest.avgMs);
+            const modeTextMap = {
+                random: '隨機',
+                nearly: '近乎有序',
+                reversed: '完全反序'
+            };
+            summaryBox.textContent = `資料型態：${modeTextMap[mode]}\n資料筆數 n：${n}\n重複次數：${repeats}\n最快：${fastest.name}（${fastest.avgMs.toFixed(3)} ms）\n最慢 / 最快 約 ${ratio.toFixed(2)} 倍`;
+        }
+
+        function generateData(n, mode) {
+            const arr = Array.from({ length: n }, () => Math.floor(Math.random() * 100000));
+            if (mode === 'reversed') {
+                return arr.sort((a, b) => b - a);
+            }
+            if (mode === 'nearly') {
+                const sorted = arr.sort((a, b) => a - b);
+                const swapCount = Math.max(1, Math.floor(n * 0.03));
+                for (let i = 0; i < swapCount; i += 1) {
+                    const a = Math.floor(Math.random() * n);
+                    const b = Math.floor(Math.random() * n);
+                    const temp = sorted[a];
+                    sorted[a] = sorted[b];
+                    sorted[b] = temp;
+                }
+                return sorted;
+            }
+            return arr;
+        }
+
+        function isSorted(arr) {
+            for (let i = 1; i < arr.length; i += 1) {
+                if (arr[i - 1] > arr[i]) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function showStatus(message, isError) {
+            statusBox.style.display = 'block';
+            statusBox.textContent = message;
+            if (isError) {
+                statusBox.style.background = '#ffeef0';
+                statusBox.style.color = '#9f2c3c';
+            } else {
+                statusBox.style.background = '#edf2ff';
+                statusBox.style.color = '#35508d';
+            }
+        }
+
+        function bubbleSort(arr) {
+            const n = arr.length;
+            for (let i = 0; i < n - 1; i += 1) {
+                let swapped = false;
+                for (let j = 0; j < n - 1 - i; j += 1) {
+                    if (arr[j] > arr[j + 1]) {
+                        const temp = arr[j];
+                        arr[j] = arr[j + 1];
+                        arr[j + 1] = temp;
+                        swapped = true;
+                    }
+                }
+                if (!swapped) {
+                    break;
+                }
+            }
+            return arr;
+        }
+
+        function selectionSort(arr) {
+            const n = arr.length;
+            for (let i = 0; i < n - 1; i += 1) {
+                let minIndex = i;
+                for (let j = i + 1; j < n; j += 1) {
+                    if (arr[j] < arr[minIndex]) {
+                        minIndex = j;
+                    }
+                }
+                if (minIndex !== i) {
+                    const temp = arr[i];
+                    arr[i] = arr[minIndex];
+                    arr[minIndex] = temp;
+                }
+            }
+            return arr;
+        }
+
+        function insertionSort(arr) {
+            for (let i = 1; i < arr.length; i += 1) {
+                const key = arr[i];
+                let j = i - 1;
+                while (j >= 0 && arr[j] > key) {
+                    arr[j + 1] = arr[j];
+                    j -= 1;
+                }
+                arr[j + 1] = key;
+            }
+            return arr;
+        }
+
+        function quickSort(arr) {
+            return quickSortRecursive(arr, 0, arr.length - 1);
+        }
+
+        function quickSortRecursive(arr, left, right) {
+            if (left >= right) {
+                return arr;
+            }
+
+            const pivot = arr[Math.floor((left + right) / 2)];
+            let i = left;
+            let j = right;
+
+            while (i <= j) {
+                while (arr[i] < pivot) {
+                    i += 1;
+                }
+                while (arr[j] > pivot) {
+                    j -= 1;
+                }
+                if (i <= j) {
+                    const temp = arr[i];
+                    arr[i] = arr[j];
+                    arr[j] = temp;
+                    i += 1;
+                    j -= 1;
+                }
+            }
+
+            if (left < j) {
+                quickSortRecursive(arr, left, j);
+            }
+            if (i < right) {
+                quickSortRecursive(arr, i, right);
+            }
+            return arr;
+        }
+
+        function mergeSort(arr) {
+            if (arr.length <= 1) {
+                return arr;
+            }
+            const mid = Math.floor(arr.length / 2);
+            const left = mergeSort(arr.slice(0, mid));
+            const right = mergeSort(arr.slice(mid));
+            return merge(left, right);
+        }
+
+        function merge(left, right) {
+            const merged = [];
+            let i = 0;
+            let j = 0;
+
+            while (i < left.length && j < right.length) {
+                if (left[i] <= right[j]) {
+                    merged.push(left[i]);
+                    i += 1;
+                } else {
+                    merged.push(right[j]);
+                    j += 1;
+                }
+            }
+
+            while (i < left.length) {
+                merged.push(left[i]);
+                i += 1;
+            }
+            while (j < right.length) {
+                merged.push(right[j]);
+                j += 1;
+            }
+            return merged;
+        }
+    </script>
+</body>
+</html>

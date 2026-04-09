@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>排序演算法視覺化演示</title>
+    <style>
+        :root {
+            --bg-900: #081421;
+            --bg-800: #102235;
+            --bg-700: #183149;
+            --card: rgba(255, 255, 255, 0.09);
+            --card-border: rgba(255, 255, 255, 0.2);
+            --text-main: #edf6ff;
+            --text-muted: #b7cadc;
+            --accent-cyan: #49dcb1;
+            --accent-orange: #ffb86c;
+            --accent-red: #ff7676;
+            --accent-blue: #80bfff;
+            --shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+            min-height: 100vh;
+            color: var(--text-main);
+            background:
+                radial-gradient(1200px 500px at -10% -10%, rgba(73, 220, 177, 0.18), transparent 65%),
+                radial-gradient(900px 460px at 120% 0%, rgba(255, 184, 108, 0.2), transparent 62%),
+                linear-gradient(145deg, var(--bg-900), var(--bg-700));
+            overflow-x: hidden;
+        }
+
+        .noise {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0.14;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.2) 0.45px, transparent 0.45px);
+            background-size: 4px 4px;
+            z-index: -1;
+        }
+
+        .container {
+            width: min(1180px, 92vw);
+            margin: 0 auto;
+            padding: 28px 0 42px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 22px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text-main);
+        }
+
+        .brand-dot {
+            width: 13px;
+            height: 13px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-orange));
+            box-shadow: 0 0 0 8px rgba(73, 220, 177, 0.14);
+        }
+
+        .brand h1 {
+            font-size: clamp(1.2rem, 2vw, 1.6rem);
+            letter-spacing: 0.03em;
+            font-weight: 700;
+        }
+
+        .link-home {
+            text-decoration: none;
+            color: #102235;
+            background: linear-gradient(135deg, #ffffff, #dff6ff);
+            font-weight: 700;
+            border-radius: 999px;
+            padding: 10px 18px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .link-home:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 20px;
+            margin-bottom: 22px;
+            animation: intro 0.7s ease;
+        }
+
+        .panel {
+            border-radius: 18px;
+            border: 1px solid var(--card-border);
+            background: var(--card);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow);
+        }
+
+        .hero-main {
+            padding: 24px;
+        }
+
+        .hero-main h2 {
+            font-size: clamp(1.4rem, 3vw, 2rem);
+            line-height: 1.3;
+            margin-bottom: 8px;
+        }
+
+        .hero-main p {
+            color: var(--text-muted);
+            line-height: 1.75;
+        }
+
+        .hero-note {
+            margin-top: 16px;
+            display: inline-flex;
+            gap: 10px;
+            align-items: center;
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: rgba(73, 220, 177, 0.14);
+            border: 1px solid rgba(73, 220, 177, 0.35);
+            color: #d9fff2;
+            font-size: 0.94rem;
+        }
+
+        .hero-side {
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 999px;
+            padding: 8px 12px;
+            width: fit-content;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #06243a;
+            background: linear-gradient(140deg, var(--accent-cyan), #b0ffe5);
+        }
+
+        .legend {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .legend-item {
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 10px;
+            padding: 8px 10px;
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-color {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .controls {
+            padding: 16px;
+            margin-bottom: 16px;
+            display: grid;
+            gap: 14px;
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(120px, 1fr));
+            gap: 12px;
+        }
+
+        .field {
+            display: grid;
+            gap: 5px;
+        }
+
+        .field label {
+            font-size: 0.84rem;
+            color: var(--text-muted);
+        }
+
+        select,
+        input[type="range"] {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            color: #06243a;
+            border: none;
+            border-radius: 10px;
+            padding: 8px;
+            font-size: 0.93rem;
+        }
+
+        .slider-row {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 999px;
+            padding: 10px 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s ease, filter 0.2s ease;
+            color: #052338;
+            background: linear-gradient(140deg, #f7fbff, #d9efff);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.02);
+        }
+
+        .btn-primary {
+            background: linear-gradient(140deg, var(--accent-cyan), #b6ffe8);
+        }
+
+        .btn-warn {
+            background: linear-gradient(140deg, var(--accent-orange), #ffe6b7);
+        }
+
+        .status-bar {
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.12);
+            padding: 10px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .status-main {
+            font-size: 0.94rem;
+        }
+
+        .status-main strong {
+            color: #d8fff2;
+        }
+
+        .metrics {
+            display: flex;
+            gap: 14px;
+            font-size: 0.86rem;
+            color: var(--text-muted);
+        }
+
+        .visualizer {
+            padding: 18px;
+            margin-bottom: 16px;
+        }
+
+        .bars-wrap {
+            position: relative;
+            height: min(52vh, 460px);
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(0, 0, 0, 0.1));
+            overflow: hidden;
+            display: flex;
+            align-items: flex-end;
+            gap: 3px;
+            padding: 14px;
+        }
+
+        .bars-wrap::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: linear-gradient(to top, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+            background-size: 100% 20%;
+            pointer-events: none;
+        }
+
+        .bar {
+            flex: 1;
+            min-width: 3px;
+            border-radius: 7px 7px 0 0;
+            background: linear-gradient(180deg, #84d8ff, #3f92d2);
+            transition: height 0.16s ease, transform 0.16s ease, background 0.16s ease;
+        }
+
+        .bar.active {
+            background: linear-gradient(180deg, #ffd08d, var(--accent-orange));
+            transform: translateY(-1px);
+        }
+
+        .bar.swap {
+            background: linear-gradient(180deg, #ffaaa7, var(--accent-red));
+        }
+
+        .bar.sorted {
+            background: linear-gradient(180deg, #8ff0c8, var(--accent-cyan));
+        }
+
+        .complexity {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(120px, 1fr));
+            gap: 10px;
+            padding: 14px;
+        }
+
+        .complex-card {
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+        }
+
+        .complex-card h4 {
+            font-size: 0.86rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .complex-card p {
+            font-family: "Consolas", "JetBrains Mono", monospace;
+            color: #dff2ff;
+            font-size: 0.95rem;
+        }
+
+        .complex-card.active {
+            border-color: rgba(73, 220, 177, 0.8);
+            background: rgba(73, 220, 177, 0.12);
+        }
+
+        .footer-note {
+            color: var(--text-muted);
+            text-align: center;
+            margin-top: 14px;
+            font-size: 0.84rem;
+        }
+
+        @keyframes intro {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .hero {
+                grid-template-columns: 1fr;
+            }
+
+            .controls-grid,
+            .complexity {
+                grid-template-columns: repeat(2, minmax(120px, 1fr));
+            }
+        }
+
+        @media (max-width: 720px) {
+            .container {
+                width: 94vw;
+            }
+
+            .controls-grid,
+            .complexity {
+                grid-template-columns: 1fr;
+            }
+
+            .bars-wrap {
+                height: 46vh;
+                gap: 2px;
+                padding: 10px;
+            }
+
+            .actions {
+                gap: 8px;
+            }
+
+            .btn {
+                width: 100%;
+                text-align: center;
+            }
+
+            .status-bar {
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="noise"></div>
+    <div class="container">
+        <header class="topbar">
+            <a class="brand" href="#">
+                <span class="brand-dot"></span>
+                <h1>排序演算法視覺化演示</h1>
+            </a>
+            <a class="link-home" href="index.html">返回首頁</a>
+        </header>
+
+        <section class="hero">
+            <div class="hero-main panel">
+                <h2>看見排序，不只看懂程式碼</h2>
+                <p>調整資料量、速度與演算法，直接觀察「比較」、「交換」與「完成」三個階段。這個頁面採用即時動畫步進，幫你把抽象流程轉成可視化直覺。</p>
+                <div class="hero-note">建議先用 30 筆資料與中速觀察，再切換快速排序比較差異。</div>
+            </div>
+            <aside class="hero-side panel">
+                <span class="tag">互動控制台</span>
+                <div class="legend">
+                    <div class="legend-item"><span class="legend-color" style="background: var(--accent-orange);"></span>比較中</div>
+                    <div class="legend-item"><span class="legend-color" style="background: var(--accent-red);"></span>交換中</div>
+                    <div class="legend-item"><span class="legend-color" style="background: var(--accent-cyan);"></span>已排序</div>
+                    <div class="legend-item"><span class="legend-color" style="background: var(--accent-blue);"></span>一般元素</div>
+                </div>
+            </aside>
+        </section>
+
+        <section class="controls panel">
+            <div class="controls-grid">
+                <div class="field">
+                    <label for="algorithm">演算法</label>
+                    <select id="algorithm">
+                        <option value="bubble">氣泡排序 Bubble Sort</option>
+                        <option value="selection">選擇排序 Selection Sort</option>
+                        <option value="insertion">插入排序 Insertion Sort</option>
+                        <option value="quick">快速排序 Quick Sort</option>
+                        <option value="merge">合併排序 Merge Sort</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="size">資料筆數 <span id="sizeValue">36</span></label>
+                    <input id="size" type="range" min="10" max="90" value="36" step="1">
+                    <div class="slider-row"><span>少</span><span>多</span></div>
+                </div>
+                <div class="field">
+                    <label for="speed">動畫速度 <span id="speedValue">52</span></label>
+                    <input id="speed" type="range" min="1" max="100" value="52" step="1">
+                    <div class="slider-row"><span>慢</span><span>快</span></div>
+                </div>
+                <div class="field">
+                    <label for="order">初始排列</label>
+                    <select id="order">
+                        <option value="random">隨機資料</option>
+                        <option value="reversed">反向資料</option>
+                        <option value="nearly">接近有序</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="sound">強調提示</label>
+                    <select id="sound">
+                        <option value="off">關閉</option>
+                        <option value="on">開啟</option>
+                    </select>
+                </div>
+            </div>
+            <div class="actions">
+                <button class="btn" id="generateBtn">重新產生資料</button>
+                <button class="btn btn-primary" id="playBtn">開始排序</button>
+                <button class="btn btn-warn" id="pauseBtn" disabled>暫停</button>
+                <button class="btn" id="resumeBtn" disabled>繼續</button>
+                <button class="btn" id="resetBtn">重置</button>
+            </div>
+            <div class="status-bar">
+                <div class="status-main"><strong id="statusText">待命中</strong> - 選好參數後按「開始排序」</div>
+                <div class="metrics">
+                    <span>比較次數: <strong id="compareCount">0</strong></span>
+                    <span>交換次數: <strong id="swapCount">0</strong></span>
+                    <span>步數: <strong id="stepCount">0</strong></span>
+                </div>
+            </div>
+        </section>
+
+        <section class="visualizer panel">
+            <div id="bars" class="bars-wrap"></div>
+        </section>
+
+        <section class="complexity panel" id="complexityCards">
+            <div class="complex-card" data-key="best">
+                <h4>最佳時間</h4>
+                <p id="bestValue">-</p>
+            </div>
+            <div class="complex-card" data-key="avg">
+                <h4>平均時間</h4>
+                <p id="avgValue">-</p>
+            </div>
+            <div class="complex-card" data-key="worst">
+                <h4>最差時間</h4>
+                <p id="worstValue">-</p>
+            </div>
+            <div class="complex-card" data-key="space">
+                <h4>空間複雜度</h4>
+                <p id="spaceValue">-</p>
+            </div>
+            <div class="complex-card" data-key="stable">
+                <h4>穩定性</h4>
+                <p id="stableValue">-</p>
+            </div>
+        </section>
+
+        <p class="footer-note">排序動畫僅作教學示意，步數與時間會依資料規模、瀏覽器效能而改變。</p>
+    </div>
+
+    <script>
+        const barsEl = document.getElementById("bars");
+        const algorithmEl = document.getElementById("algorithm");
+        const sizeEl = document.getElementById("size");
+        const speedEl = document.getElementById("speed");
+        const orderEl = document.getElementById("order");
+        const soundEl = document.getElementById("sound");
+
+        const sizeValueEl = document.getElementById("sizeValue");
+        const speedValueEl = document.getElementById("speedValue");
+        const statusTextEl = document.getElementById("statusText");
+
+        const compareCountEl = document.getElementById("compareCount");
+        const swapCountEl = document.getElementById("swapCount");
+        const stepCountEl = document.getElementById("stepCount");
+
+        const bestValueEl = document.getElementById("bestValue");
+        const avgValueEl = document.getElementById("avgValue");
+        const worstValueEl = document.getElementById("worstValue");
+        const spaceValueEl = document.getElementById("spaceValue");
+        const stableValueEl = document.getElementById("stableValue");
+
+        const generateBtn = document.getElementById("generateBtn");
+        const playBtn = document.getElementById("playBtn");
+        const pauseBtn = document.getElementById("pauseBtn");
+        const resumeBtn = document.getElementById("resumeBtn");
+        const resetBtn = document.getElementById("resetBtn");
+
+        let values = [];
+        let initialValues = [];
+        let currentActions = [];
+        let running = false;
+        let paused = false;
+        let currentStepIndex = 0;
+
+        const stats = {
+            compare: 0,
+            swap: 0,
+            steps: 0
+        };
+
+        const complexities = {
+            bubble: { best: "O(n)", avg: "O(n^2)", worst: "O(n^2)", space: "O(1)", stable: "是" },
+            selection: { best: "O(n^2)", avg: "O(n^2)", worst: "O(n^2)", space: "O(1)", stable: "否" },
+            insertion: { best: "O(n)", avg: "O(n^2)", worst: "O(n^2)", space: "O(1)", stable: "是" },
+            quick: { best: "O(n log n)", avg: "O(n log n)", worst: "O(n^2)", space: "O(log n)", stable: "否" },
+            merge: { best: "O(n log n)", avg: "O(n log n)", worst: "O(n log n)", space: "O(n)", stable: "是" }
+        };
+
+        sizeEl.addEventListener("input", () => {
+            sizeValueEl.textContent = sizeEl.value;
+            if (!running) {
+                regenerate();
+            }
+        });
+
+        speedEl.addEventListener("input", () => {
+            speedValueEl.textContent = speedEl.value;
+        });
+
+        algorithmEl.addEventListener("change", () => {
+            updateComplexity();
+            setStatus("演算法已切換，請開始排序");
+        });
+
+        orderEl.addEventListener("change", () => {
+            if (!running) {
+                regenerate();
+            }
+        });
+
+        generateBtn.addEventListener("click", () => {
+            if (running) {
+                stopRun("已停止，並產生新資料");
+            }
+            regenerate();
+        });
+
+        resetBtn.addEventListener("click", () => {
+            stopRun("已重置至初始資料");
+            values = [...initialValues];
+            renderBars();
+            markAllNormal();
+            resetCounters();
+        });
+
+        playBtn.addEventListener("click", async () => {
+            if (running) {
+                return;
+            }
+            running = true;
+            paused = false;
+            currentStepIndex = 0;
+            resetCounters();
+            markAllNormal();
+            values = [...initialValues];
+            renderBars();
+
+            playBtn.disabled = true;
+            pauseBtn.disabled = false;
+            resumeBtn.disabled = true;
+
+            setStatus("排序進行中");
+            currentActions = buildActions(values, algorithmEl.value);
+
+            await runActions();
+
+            if (running) {
+                running = false;
+                pauseBtn.disabled = true;
+                resumeBtn.disabled = true;
+                playBtn.disabled = false;
+                markAllSorted();
+                setStatus("排序完成");
+            }
+        });
+
+        pauseBtn.addEventListener("click", () => {
+            if (!running) {
+                return;
+            }
+            paused = true;
+            pauseBtn.disabled = true;
+            resumeBtn.disabled = false;
+            setStatus("已暫停");
+        });
+
+        resumeBtn.addEventListener("click", () => {
+            if (!running) {
+                return;
+            }
+            paused = false;
+            pauseBtn.disabled = false;
+            resumeBtn.disabled = true;
+            setStatus("排序進行中");
+        });
+
+        function setStatus(text) {
+            statusTextEl.textContent = text;
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        function getDelay() {
+            const speed = Number(speedEl.value);
+            return Math.max(8, 220 - speed * 2);
+        }
+
+        function resetCounters() {
+            stats.compare = 0;
+            stats.swap = 0;
+            stats.steps = 0;
+            syncCounters();
+        }
+
+        function syncCounters() {
+            compareCountEl.textContent = String(stats.compare);
+            swapCountEl.textContent = String(stats.swap);
+            stepCountEl.textContent = String(stats.steps);
+        }
+
+        function regenerate() {
+            initialValues = generateValues(Number(sizeEl.value), orderEl.value);
+            values = [...initialValues];
+            renderBars();
+            markAllNormal();
+            resetCounters();
+            setStatus("資料已更新，準備排序");
+        }
+
+        function stopRun(text) {
+            running = false;
+            paused = false;
+            playBtn.disabled = false;
+            pauseBtn.disabled = true;
+            resumeBtn.disabled = true;
+            currentActions = [];
+            currentStepIndex = 0;
+            setStatus(text);
+        }
+
+        function generateValues(size, mode) {
+            const arr = [];
+            for (let i = 0; i < size; i += 1) {
+                arr.push(Math.floor(Math.random() * 95) + 5);
+            }
+
+            if (mode === "reversed") {
+                arr.sort((a, b) => b - a);
+            }
+
+            if (mode === "nearly") {
+                arr.sort((a, b) => a - b);
+                const swaps = Math.max(1, Math.floor(size * 0.12));
+                for (let i = 0; i < swaps; i += 1) {
+                    const a = Math.floor(Math.random() * size);
+                    const b = Math.floor(Math.random() * size);
+                    [arr[a], arr[b]] = [arr[b], arr[a]];
+                }
+            }
+
+            return arr;
+        }
+
+        function renderBars(active = [], swap = [], sorted = []) {
+            barsEl.innerHTML = "";
+            const size = values.length;
+            for (let i = 0; i < size; i += 1) {
+                const bar = document.createElement("div");
+                bar.className = "bar";
+                bar.style.height = `${values[i]}%`;
+
+                if (active.includes(i)) {
+                    bar.classList.add("active");
+                }
+                if (swap.includes(i)) {
+                    bar.classList.add("swap");
+                }
+                if (sorted.includes(i)) {
+                    bar.classList.add("sorted");
+                }
+
+                barsEl.appendChild(bar);
+            }
+        }
+
+        function markAllNormal() {
+            renderBars();
+        }
+
+        function markAllSorted() {
+            const indices = values.map((_, index) => index);
+            renderBars([], [], indices);
+        }
+
+        async function runActions() {
+            while (running && currentStepIndex < currentActions.length) {
+                if (paused) {
+                    await sleep(40);
+                    continue;
+                }
+
+                const action = currentActions[currentStepIndex];
+                stats.steps += 1;
+
+                if (action.type === "compare") {
+                    stats.compare += 1;
+                    renderBars(action.indices, [], action.sorted || []);
+                }
+
+                if (action.type === "swap") {
+                    stats.swap += 1;
+                    const [i, j] = action.indices;
+                    [values[i], values[j]] = [values[j], values[i]];
+                    renderBars([], action.indices, action.sorted || []);
+                    pulseBackground();
+                }
+
+                if (action.type === "set") {
+                    values[action.index] = action.value;
+                    renderBars(action.active || [], [], action.sorted || []);
+                }
+
+                if (action.type === "mark") {
+                    renderBars([], [], action.sorted || []);
+                }
+
+                syncCounters();
+                currentStepIndex += 1;
+                await sleep(getDelay());
+            }
+        }
+
+        function pulseBackground() {
+            if (soundEl.value !== "on") {
+                return;
+            }
+            barsEl.animate(
+                [
+                    { filter: "brightness(1)" },
+                    { filter: "brightness(1.08)" },
+                    { filter: "brightness(1)" }
+                ],
+                { duration: 130, easing: "ease-out" }
+            );
+        }
+
+        function buildActions(source, algorithm) {
+            const arr = [...source];
+            if (algorithm === "bubble") {
+                return bubbleActions(arr);
+            }
+            if (algorithm === "selection") {
+                return selectionActions(arr);
+            }
+            if (algorithm === "insertion") {
+                return insertionActions(arr);
+            }
+            if (algorithm === "quick") {
+                return quickActions(arr);
+            }
+            return mergeActions(arr);
+        }
+
+        function bubbleActions(arr) {
+            const actions = [];
+            const sorted = [];
+            for (let i = 0; i < arr.length; i += 1) {
+                for (let j = 0; j < arr.length - i - 1; j += 1) {
+                    actions.push({ type: "compare", indices: [j, j + 1], sorted: [...sorted] });
+                    if (arr[j] > arr[j + 1]) {
+                        [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+                        actions.push({ type: "swap", indices: [j, j + 1], sorted: [...sorted] });
+                    }
+                }
+                sorted.push(arr.length - i - 1);
+                actions.push({ type: "mark", sorted: [...sorted] });
+            }
+            return actions;
+        }
+
+        function selectionActions(arr) {
+            const actions = [];
+            const sorted = [];
+            for (let i = 0; i < arr.length; i += 1) {
+                let min = i;
+                for (let j = i + 1; j < arr.length; j += 1) {
+                    actions.push({ type: "compare", indices: [min, j], sorted: [...sorted] });
+                    if (arr[j] < arr[min]) {
+                        min = j;
+                    }
+                }
+                if (min !== i) {
+                    [arr[min], arr[i]] = [arr[i], arr[min]];
+                    actions.push({ type: "swap", indices: [i, min], sorted: [...sorted] });
+                }
+                sorted.push(i);
+                actions.push({ type: "mark", sorted: [...sorted] });
+            }
+            return actions;
+        }
+
+        function insertionActions(arr) {
+            const actions = [];
+            for (let i = 1; i < arr.length; i += 1) {
+                const key = arr[i];
+                let j = i - 1;
+                actions.push({ type: "compare", indices: [i, j], sorted: [] });
+                while (j >= 0 && arr[j] > key) {
+                    actions.push({ type: "compare", indices: [j, j + 1], sorted: [] });
+                    arr[j + 1] = arr[j];
+                    actions.push({ type: "set", index: j + 1, value: arr[j], active: [j, j + 1], sorted: [] });
+                    j -= 1;
+                }
+                arr[j + 1] = key;
+                actions.push({ type: "set", index: j + 1, value: key, active: [j + 1], sorted: [] });
+            }
+            actions.push({ type: "mark", sorted: arr.map((_, i) => i) });
+            return actions;
+        }
+
+        function quickActions(arr) {
+            const actions = [];
+            const sorted = [];
+
+            function partition(low, high) {
+                const pivot = arr[high];
+                let i = low;
+                for (let j = low; j < high; j += 1) {
+                    actions.push({ type: "compare", indices: [j, high], sorted: [...sorted] });
+                    if (arr[j] <= pivot) {
+                        if (i !== j) {
+                            [arr[i], arr[j]] = [arr[j], arr[i]];
+                            actions.push({ type: "swap", indices: [i, j], sorted: [...sorted] });
+                        }
+                        i += 1;
+                    }
+                }
+                if (i !== high) {
+                    [arr[i], arr[high]] = [arr[high], arr[i]];
+                    actions.push({ type: "swap", indices: [i, high], sorted: [...sorted] });
+                }
+                sorted.push(i);
+                actions.push({ type: "mark", sorted: [...sorted] });
+                return i;
+            }
+
+            function quick(low, high) {
+                if (low < high) {
+                    const p = partition(low, high);
+                    quick(low, p - 1);
+                    quick(p + 1, high);
+                } else if (low === high) {
+                    sorted.push(low);
+                    actions.push({ type: "mark", sorted: [...sorted] });
+                }
+            }
+
+            quick(0, arr.length - 1);
+            actions.push({ type: "mark", sorted: arr.map((_, i) => i) });
+            return actions;
+        }
+
+        function mergeActions(arr) {
+            const actions = [];
+
+            function merge(left, mid, right) {
+                const leftPart = arr.slice(left, mid + 1);
+                const rightPart = arr.slice(mid + 1, right + 1);
+                let i = 0;
+                let j = 0;
+                let k = left;
+
+                while (i < leftPart.length && j < rightPart.length) {
+                    const leftIndex = left + i;
+                    const rightIndex = mid + 1 + j;
+                    actions.push({ type: "compare", indices: [leftIndex, rightIndex], sorted: [] });
+                    if (leftPart[i] <= rightPart[j]) {
+                        arr[k] = leftPart[i];
+                        actions.push({ type: "set", index: k, value: leftPart[i], active: [k], sorted: [] });
+                        i += 1;
+                    } else {
+                        arr[k] = rightPart[j];
+                        actions.push({ type: "set", index: k, value: rightPart[j], active: [k], sorted: [] });
+                        j += 1;
+                    }
+                    k += 1;
+                }
+
+                while (i < leftPart.length) {
+                    arr[k] = leftPart[i];
+                    actions.push({ type: "set", index: k, value: leftPart[i], active: [k], sorted: [] });
+                    i += 1;
+                    k += 1;
+                }
+
+                while (j < rightPart.length) {
+                    arr[k] = rightPart[j];
+                    actions.push({ type: "set", index: k, value: rightPart[j], active: [k], sorted: [] });
+                    j += 1;
+                    k += 1;
+                }
+            }
+
+            function sort(left, right) {
+                if (left >= right) {
+                    return;
+                }
+                const mid = Math.floor((left + right) / 2);
+                sort(left, mid);
+                sort(mid + 1, right);
+                merge(left, mid, right);
+            }
+
+            sort(0, arr.length - 1);
+            actions.push({ type: "mark", sorted: arr.map((_, i) => i) });
+            return actions;
+        }
+
+        function updateComplexity() {
+            const data = complexities[algorithmEl.value];
+            bestValueEl.textContent = data.best;
+            avgValueEl.textContent = data.avg;
+            worstValueEl.textContent = data.worst;
+            spaceValueEl.textContent = data.space;
+            stableValueEl.textContent = data.stable;
+
+            document.querySelectorAll(".complex-card").forEach(card => {
+                card.classList.remove("active");
+            });
+            document.querySelector('[data-key="avg"]').classList.add("active");
+        }
+
+        updateComplexity();
+        regenerate();
+    </script>
+</body>
+</html>

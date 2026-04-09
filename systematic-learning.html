@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系統性學習路線 - 排序演算法</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif;
+            line-height: 1.7;
+            color: #2c2c2c;
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 45%, #7c3aed 100%);
+            min-height: 100vh;
+            padding: 24px;
+        }
+
+        .container {
+            max-width: 1080px;
+            margin: 0 auto;
+            background: linear-gradient(180deg, #fffaf0 0%, #fff6ee 100%);
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.28);
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            padding: 44px 28px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            opacity: 0.92;
+            font-size: 1.05rem;
+        }
+
+        main {
+            padding: 34px 28px 44px;
+        }
+
+        section {
+            margin-bottom: 34px;
+        }
+
+        h2 {
+            color: #4f46e5;
+            border-bottom: 3px solid #4f46e5;
+            padding-bottom: 8px;
+            margin-bottom: 14px;
+            font-size: 1.45rem;
+        }
+
+        h3 {
+            color: #6d28d9;
+            margin: 8px 0;
+            font-size: 1.15rem;
+        }
+
+        p, li {
+            font-size: 1rem;
+        }
+
+        ul {
+            margin-left: 22px;
+            margin-top: 8px;
+        }
+
+        .route {
+            display: grid;
+            gap: 18px;
+        }
+
+        .stage {
+            background: #fff;
+            border-radius: 10px;
+            border-left: 6px solid #667eea;
+            padding: 18px 16px;
+            box-shadow: 0 6px 18px rgba(79, 70, 229, 0.12);
+        }
+
+        .stage .meta {
+            display: inline-block;
+            margin-top: 10px;
+            background: #eef2ff;
+            color: #3730a3;
+            padding: 5px 10px;
+            border-radius: 999px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .checklist {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            padding: 16px;
+        }
+
+        .tips {
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            border-radius: 10px;
+            padding: 16px;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            text-decoration: none;
+            color: #fff;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            padding: 10px 18px;
+            border-radius: 999px;
+            font-weight: 700;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.35);
+        }
+
+        .btn.secondary {
+            background: linear-gradient(135deg, #0ea5e9, #2563eb);
+        }
+
+        .badge {
+            display: inline-block;
+            font-size: 0.84rem;
+            color: #7c2d12;
+            background: #ffedd5;
+            border: 1px solid #fdba74;
+            border-radius: 999px;
+            padding: 4px 10px;
+            margin-bottom: 8px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+
+            header h1 {
+                font-size: 1.75rem;
+            }
+
+            main {
+                padding: 24px 18px 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>排序演算法系統性學習路線</h1>
+            <p>用 4 個階段建立完整能力：觀念理解、手寫實作、效能分析、題目應用。</p>
+        </header>
+
+        <main>
+            <section>
+                <h2>學習地圖</h2>
+                <div class="route">
+                    <article class="stage">
+                        <h3>第一階段：基礎觀念建立</h3>
+                        <ul>
+                            <li>理解比較式排序的核心：比較、交換、穩定性。</li>
+                            <li>先掌握氣泡排序、選擇排序、插入排序差異。</li>
+                            <li>會口頭說明時間複雜度與空間複雜度的意義。</li>
+                        </ul>
+                        <span class="meta">建議時間：2-3 天</span>
+                    </article>
+
+                    <article class="stage">
+                        <h3>第二階段：手寫與除錯能力</h3>
+                        <ul>
+                            <li>不看答案手寫三種基礎排序。</li>
+                            <li>為每個排序加上測試資料（含重複值、逆序、已排序）。</li>
+                            <li>練習用列印追蹤每一輪陣列變化。</li>
+                        </ul>
+                        <span class="meta">建議時間：3-5 天</span>
+                    </article>
+
+                    <article class="stage">
+                        <h3>第三階段：進階演算法</h3>
+                        <ul>
+                            <li>學習快速排序與合併排序的分治策略。</li>
+                            <li>能比較平均情況與最壞情況差異。</li>
+                            <li>理解遞迴樹與 partition 的運作。</li>
+                        </ul>
+                        <span class="meta">建議時間：4-6 天</span>
+                    </article>
+
+                    <article class="stage">
+                        <h3>第四階段：實戰應用與選型</h3>
+                        <ul>
+                            <li>根據資料特徵選擇排序法（資料量、近乎排序、穩定需求）。</li>
+                            <li>用實測數據對照理論複雜度。</li>
+                            <li>完成至少 5 題排序相關題目並寫出解題紀錄。</li>
+                        </ul>
+                        <span class="meta">建議時間：5-7 天</span>
+                    </article>
+                </div>
+            </section>
+
+            <section class="checklist">
+                <h2>每週自我檢核</h2>
+                <ul>
+                    <li>我是否能獨立解釋每種排序的核心流程？</li>
+                    <li>我是否能在 15 分鐘內手寫一個排序並通過測試？</li>
+                    <li>我是否能說出該排序適合與不適合的場景？</li>
+                    <li>我是否有用至少一種語言完成效能測試？</li>
+                </ul>
+            </section>
+
+            <section class="tips">
+                <div class="badge">學習提示</div>
+                <h2>高效率學習法</h2>
+                <ul>
+                    <li>每天固定 45 分鐘：25 分鐘學習 + 20 分鐘實作。</li>
+                    <li>每學完一種排序，立刻做一題相關練習。</li>
+                    <li>把錯誤案例記錄成「除錯筆記」，下次先看再寫。</li>
+                </ul>
+            </section>
+
+            <div class="btn-row">
+                <a class="btn" href="index.html">回到首頁</a>
+                <a class="btn secondary" href="performance-analysis.html">前往性能分析</a>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

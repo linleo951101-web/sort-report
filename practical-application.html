@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>實戰應用 | 排序演算法實驗室</title>
+    <style>
+        :root {
+            --bg: #f3f7fb;
+            --panel: #ffffff;
+            --text: #253447;
+            --muted: #607284;
+            --primary: #1e9ab5;
+            --primary-2: #34c8a6;
+            --line: #dce7f2;
+            --shadow: 0 12px 28px rgba(37, 52, 71, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+            color: var(--text);
+            line-height: 1.75;
+            background:
+                radial-gradient(circle at -5% -5%, rgba(30, 154, 181, 0.22), transparent 30%),
+                radial-gradient(circle at 105% 15%, rgba(52, 200, 166, 0.24), transparent 28%),
+                linear-gradient(180deg, #f9fcff 0%, var(--bg) 100%);
+        }
+
+        .container {
+            width: min(1100px, 92vw);
+            margin: 0 auto;
+            padding: 34px 0 48px;
+        }
+
+        .top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .back {
+            text-decoration: none;
+            color: #0e2a40;
+            border: 1px solid var(--line);
+            background: #fff;
+            border-radius: 999px;
+            padding: 9px 14px;
+            font-weight: 700;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .back:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 16px rgba(37, 52, 71, 0.12);
+        }
+
+        .hero {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            margin-bottom: 16px;
+        }
+
+        .hero h1 {
+            font-size: clamp(1.7rem, 3.2vw, 2.4rem);
+            line-height: 1.35;
+            margin-bottom: 8px;
+        }
+
+        .hero p {
+            color: var(--muted);
+        }
+
+        .tip {
+            margin-top: 14px;
+            border-left: 4px solid var(--primary);
+            background: linear-gradient(90deg, rgba(30, 154, 181, 0.12), transparent 75%);
+            border-radius: 0 10px 10px 0;
+            padding: 8px 0 8px 12px;
+            color: #355168;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(260px, 1fr));
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .card {
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 18px;
+            box-shadow: 0 10px 18px rgba(23, 47, 73, 0.07);
+        }
+
+        .card h2 {
+            font-size: 1.06rem;
+            margin-bottom: 8px;
+            color: #183148;
+        }
+
+        .card p {
+            color: #546a7f;
+            font-size: 0.97rem;
+        }
+
+        .section {
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 16px;
+        }
+
+        .section h2 {
+            font-size: 1.14rem;
+            margin-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+            overflow: hidden;
+            border-radius: 12px;
+            border: 1px solid var(--line);
+        }
+
+        thead th {
+            text-align: left;
+            background: linear-gradient(135deg, rgba(30, 154, 181, 0.16), rgba(52, 200, 166, 0.16));
+            color: #21435d;
+            font-weight: 700;
+            padding: 10px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        tbody td {
+            padding: 10px;
+            border-bottom: 1px solid var(--line);
+            color: #4f6478;
+            vertical-align: top;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .steps {
+            list-style: none;
+            display: grid;
+            gap: 10px;
+        }
+
+        .steps li {
+            position: relative;
+            padding-left: 24px;
+            color: #4f6478;
+        }
+
+        .steps li::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 11px;
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+            background: linear-gradient(140deg, var(--primary), var(--primary-2));
+        }
+
+        .actions {
+            margin-top: 16px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .btn {
+            text-decoration: none;
+            border-radius: 999px;
+            padding: 10px 16px;
+            font-weight: 700;
+            transition: transform 0.2s ease;
+        }
+
+        .btn-main {
+            color: #fff;
+            background: linear-gradient(140deg, #1e9ab5, #34c8a6);
+            box-shadow: 0 10px 18px rgba(30, 154, 181, 0.24);
+        }
+
+        .btn-alt {
+            color: #173047;
+            background: #fff;
+            border: 1px solid var(--line);
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .foot {
+            margin-top: 14px;
+            text-align: center;
+            color: #6d7d8d;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 820px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero,
+            .card,
+            .section {
+                padding: 16px;
+            }
+
+            table,
+            thead,
+            tbody,
+            tr,
+            td,
+            th {
+                display: block;
+            }
+
+            thead {
+                display: none;
+            }
+
+            tbody tr {
+                border-bottom: 1px solid var(--line);
+                padding: 8px 0;
+            }
+
+            tbody td {
+                border: none;
+                padding: 6px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <div class="top">
+            <a class="back" href="index.html">返回首頁</a>
+            <span style="color:#607284; font-size:0.92rem;">更新日期：2026/04/09</span>
+        </div>
+
+        <section class="hero">
+            <h1>排序演算法的實戰應用</h1>
+            <p>排序不只出現在教科書，實際上它是資料處理流程中的基礎模組。從搜尋結果排名、交易記錄整理，到後端批次作業，排序策略都會影響效能與使用者體驗。</p>
+            <div class="tip">實務重點：先確認資料特性，再選排序法，最後才是微調實作細節。</div>
+        </section>
+
+        <section class="grid">
+            <article class="card">
+                <h2>應用場景 1：電商商品清單</h2>
+                <p>依價格、評分、上架時間多條件排序。資料量大且更新頻繁時，會結合資料庫索引與分頁，避免一次性全量排序造成延遲。</p>
+            </article>
+            <article class="card">
+                <h2>應用場景 2：日誌與監控事件</h2>
+                <p>將分散來源的事件按時間戳排序後再分析。常用穩定排序，確保同時間點事件仍保留原始輸入順序，方便問題追溯。</p>
+            </article>
+            <article class="card">
+                <h2>應用場景 3：排行榜與推薦</h2>
+                <p>除了排序速度，還要考慮公平性與可重現性。通常會先做前置過濾，再針對候選集合排序，以降低計算量。</p>
+            </article>
+            <article class="card">
+                <h2>應用場景 4：排程與批次任務</h2>
+                <p>任務按優先級、截止時間或成本排序。資料接近有序時，插入排序或混合策略在局部調整上反而更有效率。</p>
+            </article>
+        </section>
+
+        <section class="section">
+            <h2>常見選型對照</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>情境</th>
+                        <th>建議排序策略</th>
+                        <th>理由</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>資料量小且接近有序</td>
+                        <td>插入排序</td>
+                        <td>實作簡單，資料搬移少，常有不錯常數時間表現</td>
+                    </tr>
+                    <tr>
+                        <td>一般大型資料排序</td>
+                        <td>快速排序（搭配隨機 pivot）</td>
+                        <td>平均效率佳，實務常用</td>
+                    </tr>
+                    <tr>
+                        <td>需要穩定排序結果</td>
+                        <td>合併排序</td>
+                        <td>穩定且時間複雜度可預測，適合資料管線</td>
+                    </tr>
+                    <tr>
+                        <td>記憶體限制明確</td>
+                        <td>原地排序策略</td>
+                        <td>降低額外空間占用，避免記憶體壓力</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="section">
+            <h2>落地流程建議</h2>
+            <ul class="steps">
+                <li>先以真實資料樣本建立基準測試，不只看理論複雜度。</li>
+                <li>區分排序鍵與次排序鍵，確認是否需要穩定性。</li>
+                <li>把排序放在正確層級：資料庫、服務端或前端，避免重複排序。</li>
+                <li>在高流量場景加入快取與分頁，減少反覆全量排序。</li>
+                <li>持續監測延遲與記憶體使用，必要時改為混合策略。</li>
+            </ul>
+            <div class="actions">
+                <a class="btn btn-main" href="visual-demo.html">前往視覺化演示</a>
+                <a class="btn btn-alt" href="reflection-conclusion.html">閱讀心得與結論</a>
+            </div>
+        </section>
+
+        <p class="foot">本頁適合作為專題報告或實作課程的應用章節，可依需求新增案例與指標。</p>
+    </main>
+</body>
+</html>
