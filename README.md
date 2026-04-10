@@ -2,7 +2,7 @@
 
 學號: 11428230 
 
-姓名: 林晉愷
+姓名: 林晉愷　Ｊｉｎ－ｋａｉ　Ｌｉｎ
 
 模擬頁面:https://linleo951101-web.github.io/sort-report/
 
