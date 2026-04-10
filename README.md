@@ -1,9 +1,10 @@
 # 排序報告
 
 學號: 11428230 
-姓名: 林晉愷  
-模擬頁面:https://github.com/linleo951101-web/sort-report/blob/main/index.html
 
+姓名: 林晉愷
+
+模擬頁面:https://linleo951101-web.github.io/sort-report/
 ---
 
 ## 1. 氣泡排序法（Bubble Sort）
